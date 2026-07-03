@@ -298,17 +298,23 @@ function renderBuildPanel() {
 
   if (!container || !country) return;
 
-  const tabs = Object.keys(BUILDINGS)
-    .map(category => `
-      <button 
-        data-build-tab="${category}" 
-        class="${NEXUS.activeBuildTab === category ? "active" : ""}">
-        ${getBuildCategoryName(category)}
-      </button>
-    `)
-    .join("");
+  const tabs = [
+  ...Object.keys(BUILDINGS),
+  "military_units"
+].map(category => `
+  <button 
+    data-build-tab="${category}" 
+    class="${NEXUS.activeBuildTab === category ? "active" : ""}">
+    ${getBuildCategoryName(category)}
+  </button>
+`).join("");
 
   const buildings = BUILDINGS[NEXUS.activeBuildTab] || [];
+
+if (NEXUS.activeBuildTab === "military_units") {
+  container.innerHTML = renderMilitaryProductionPanel(country, tabs);
+  return;
+}
 
   const rows = buildings.map(building => {
     const defaultRegion = country.regions?.[0];
@@ -402,7 +408,7 @@ function getBuildCategoryName(category) {
     infrastructure: "Infraestructura",
     energy: "Energía",
     parks: "Parques",
-    military: "Militar"
+    military_units: "Unidades"
   };
 
   return names[category] || category;
@@ -595,6 +601,72 @@ function getIndustrialIndex(country) {
 function initializeUI() {
   renderAll();
 }
+
+function renderMilitaryProductionPanel(country, tabs) {
+  return `
+    <div class="tabs">${tabs}</div>
+
+    <div class="notice">
+      Producción de unidades militares. El coste incluye adquisición inicial; el mantenimiento diario se descuenta en la simulación avanzada.
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Unidad</th>
+            <th>Coste</th>
+            <th>Tiempo</th>
+            <th>Manten.</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${MILITARY_UNITS.map(unit => `
+            <tr>
+              <td><strong>${unit.icon} ${unit.name}</strong></td>
+              <td>${formatEuro(unit.cost)}</td>
+              <td>${unit.days} días</td>
+              <td>${formatEuro(unit.upkeep)}/día</td>
+              <td>
+                <button data-unit-minus="${unit.id}">−</button>
+                <span class="pill" id="unit-qty-${unit.id}">1</span>
+                <button data-unit-plus="${unit.id}">+</button>
+                <button class="success" data-unit-produce="${unit.id}">Producir</button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="section-title" style="margin-top:12px;">Cola de producción</h3>
+    ${renderMilitaryQueue(country)}
+  `;
+}
+
+function renderMilitaryQueue(country) {
+  if (!country.militaryQueue || country.militaryQueue.length === 0) {
+    return `<div class="small">Sin unidades en producción.</div>`;
+  }
+
+  return country.militaryQueue.map(project => {
+    const progress = 100 * (1 - project.remainingDays / project.totalDays);
+
+    return `
+      <div class="queue-item">
+        <div class="queue-item-header">
+          <span class="queue-item-name">${project.icon} ${project.quantity} × ${project.name}</span>
+          <span class="queue-item-days">${project.remainingDays}/${project.totalDays} días</span>
+        </div>
+        <div class="progress">
+          <span style="width:${progress}%"></span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
 
 /* =========================================================
    EXPORT GLOBAL
