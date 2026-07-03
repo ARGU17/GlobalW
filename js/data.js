@@ -1122,7 +1122,17 @@ function initializeCountrySites(country) {
         lon: -6.2886,
         buildingId: null,
         level: 1
-      }
+      },
+      {
+  id: "san-sebastian",
+  name: "San Sebastián",
+  type: "port",
+  lat: 43.3183,
+  lon: -1.9812,
+  buildingId: null,
+  level: 1
+},
+      
     ];
     return;
   }
