@@ -1199,6 +1199,113 @@ function structuredCloneSafe(value) {
 }
 
 /* =========================================================
+   MILITARY
+========================================================= */
+const MILITARY_UNITS = [
+  {
+    id: "fighter",
+    icon: "🛩️",
+    name: "Caza polivalente",
+    domain: "air",
+    cost: 45_000_000,
+    days: 30,
+    upkeep: 120_000,
+    power: 900
+  },
+  {
+    id: "bomber",
+    icon: "✈️",
+    name: "Bombardero estratégico",
+    domain: "air",
+    cost: 120_000_000,
+    days: 60,
+    upkeep: 280_000,
+    power: 2_400
+  },
+  {
+    id: "tank",
+    icon: "🛡️",
+    name: "Tanque de combate",
+    domain: "land",
+    cost: 15_000_000,
+    days: 20,
+    upkeep: 45_000,
+    power: 420
+  },
+  {
+    id: "destroyer",
+    icon: "🚢",
+    name: "Destructor",
+    domain: "sea",
+    cost: 85_000_000,
+    days: 40,
+    upkeep: 200_000,
+    power: 1_700
+  },
+  {
+    id: "submarine",
+    icon: "🌊",
+    name: "Submarino",
+    domain: "sea",
+    cost: 70_000_000,
+    days: 40,
+    upkeep: 170_000,
+    power: 1_600
+  },
+  {
+    id: "amphibious",
+    icon: "⚓",
+    name: "Unidad anfibia",
+    domain: "sea-land",
+    cost: 25_000_000,
+    days: 25,
+    upkeep: 60_000,
+    power: 650
+  },
+  {
+    id: "carrier",
+    icon: "🛳️",
+    name: "Portaviones",
+    domain: "sea-air",
+    cost: 240_000_000,
+    days: 90,
+    upkeep: 600_000,
+    power: 6_500
+  },
+  {
+    id: "frigate",
+    icon: "🚢",
+    name: "Fragata",
+    domain: "sea",
+    cost: 40_000_000,
+    days: 25,
+    upkeep: 100_000,
+    power: 950
+  },
+  {
+    id: "attack_helicopter",
+    icon: "🚁",
+    name: "Helicóptero de ataque",
+    domain: "air-land",
+    cost: 30_000_000,
+    days: 20,
+    upkeep: 80_000,
+    power: 700
+  },
+  {
+    id: "recon_drone",
+    icon: "🛰️",
+    name: "Dron de reconocimiento",
+    domain: "air-cyber",
+    cost: 8_000_000,
+    days: 10,
+    upkeep: 20_000,
+    power: 180
+  }
+];
+
+
+/* =========================================================
    EXPORT GLOBAL
 ========================================================= */
 
@@ -1206,6 +1313,7 @@ window.MAP_LAYERS = MAP_LAYERS;
 window.BUILDINGS = BUILDINGS;
 window.COUNTRY_DATA = COUNTRY_DATA;
 window.MARKET_DATA = MARKET_DATA;
+window.MILITARY_UNITS = MILITARY_UNITS;
 
 window.createInitialGameState = createInitialGameState;
 window.initializeCountrySites = initializeCountrySites;
