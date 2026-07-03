@@ -1,1 +1,634 @@
-Commit changes
+:root {
+  --bg: #030912;
+  --bg-2: #071421;
+  --panel: rgba(7, 26, 43, 0.92);
+  --panel-strong: rgba(11, 34, 56, 0.96);
+  --panel-dark: #04111f;
+  --line: #214466;
+  --line-soft: rgba(68, 124, 171, 0.35);
+
+  --text: #eef7ff;
+  --muted: #91a8bf;
+  --blue: #1596ff;
+  --cyan: #00d4ff;
+  --green: #47d16c;
+  --yellow: #f7b733;
+  --red: #ff4d5f;
+  --purple: #b887ff;
+
+  --shadow: rgba(0, 0, 0, 0.55);
+  --radius: 9px;
+  --topbar-height: 104px;
+  --nav-height: 42px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -10%, #10395a 0, #071421 38%, #020711 100%);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* =========================
+   BASE CONTROLS
+========================= */
+
+button,
+select,
+input {
+  font-family: inherit;
+  background: #0b2340;
+  color: var(--text);
+  border: 1px solid #2d5b89;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover,
+select:hover {
+  filter: brightness(1.16);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.active,
+#main-nav button.active {
+  background: #063f78;
+  border-color: #18b6ff;
+  box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.35) inset;
+}
+
+button.danger {
+  background: #4a1624;
+  border-color: #b83850;
+}
+
+button.warning {
+  background: #4a3511;
+  border-color: #c98c1c;
+}
+
+button.success {
+  background: #123d2b;
+  border-color: #2da85c;
+}
+
+select {
+  width: 100%;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+#topbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--topbar-height);
+  z-index: 2000;
+  background: linear-gradient(180deg, #03070d, #071421);
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 220px 1fr 275px;
+  gap: 8px;
+  padding: 8px;
+}
+
+.brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #123756;
+  background: var(--panel-dark);
+  border-radius: var(--radius);
+  padding: 8px;
+}
+
+.brand-icon {
+  font-size: 38px;
+}
+
+.brand h1 {
+  font-size: 18px;
+  line-height: 1.1;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.brand p {
+  margin: 2px 0 0;
+  font-size: 9px;
+  color: #9ecbff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* =========================
+   GLOBAL KPIs
+========================= */
+
+.global-kpis {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(80px, 1fr));
+  gap: 5px;
+}
+
+.kpi {
+  border: 1px solid #123756;
+  background: linear-gradient(180deg, #071a2b, #06111d);
+  border-radius: 7px;
+  padding: 7px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.kpi-label {
+  font-size: 11px;
+  color: #bdd6f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi-value {
+  font-size: 14px;
+  font-weight: 900;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi-detail {
+  font-size: 10px;
+  margin-top: 2px;
+  color: var(--green);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================
+   TIME PANEL
+========================= */
+
+.time-panel {
+  border: 1px solid #123756;
+  background: #06111d;
+  border-radius: 7px;
+  padding: 9px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.sim-date {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.sim-time {
+  font-size: 16px;
+}
+
+.sim-status {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.speed-controls {
+  display: flex;
+  gap: 4px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+/* =========================
+   MAIN NAVIGATION
+========================= */
+
+#main-nav {
+  position: fixed;
+  left: 8px;
+  right: 8px;
+  top: calc(var(--topbar-height) + 8px);
+  height: var(--nav-height);
+  z-index: 1999;
+  background: rgba(6, 17, 29, 0.94);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 8px;
+  overflow-x: auto;
+}
+
+#main-nav button {
+  height: 30px;
+  min-width: 105px;
+  white-space: nowrap;
+}
+
+/* =========================
+   DESKTOP / WINDOWS
+========================= */
+
+#desktop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: calc(var(--topbar-height) + var(--nav-height) + 16px);
+  bottom: 0;
+  overflow: auto;
+  padding: 8px;
+}
+
+.window {
+  position: absolute;
+  background: linear-gradient(180deg, var(--panel-strong), rgba(6, 20, 33, 0.94));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 42px var(--shadow);
+  overflow: hidden;
+  min-width: 260px;
+  min-height: 120px;
+  resize: both;
+}
+
+.window-title {
+  height: 28px;
+  background: #06162a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 9px;
+  border-bottom: 1px solid #123756;
+  cursor: move;
+}
+
+.window-title span:first-child {
+  font-size: 12px;
+  color: #57b7ff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 900;
+}
+
+.drag-hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.window-content {
+  padding: 10px;
+  height: calc(100% - 28px);
+  overflow: auto;
+}
+
+.map-window-content {
+  position: relative;
+  padding: 0;
+  height: calc(100% - 28px);
+  overflow: hidden;
+}
+
+/* =========================
+   MAPS
+========================= */
+
+#world-map,
+#local-map {
+  width: 100%;
+  height: 100%;
+  background: #061d32;
+}
+
+.leaflet-container {
+  background: #061d32;
+  font-family: inherit;
+}
+
+.leaflet-control-zoom a {
+  background: #071a2b !important;
+  color: #fff !important;
+  border-color: #214466 !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #05111f;
+  color: #eaf6ff;
+  border: 1px solid #2d5b89;
+}
+
+.leaflet-tooltip {
+  background: #05111f;
+  color: #eaf6ff;
+  border: 1px solid #2d5b89;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+
+/* =========================
+   MAP OVERLAYS
+========================= */
+
+.map-overlay {
+  position: absolute;
+  z-index: 800;
+  background: rgba(4, 17, 31, 0.91);
+  border: 1px solid #2d5b89;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.map-legend {
+  left: 10px;
+  top: 10px;
+  font-size: 12px;
+}
+
+.map-layers {
+  right: 10px;
+  top: 10px;
+  width: 180px;
+}
+
+.map-layers button {
+  display: block;
+  width: 100%;
+  margin: 4px 0;
+  text-align: left;
+}
+
+.country-search {
+  left: 10px;
+  bottom: 10px;
+  width: 260px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0;
+}
+
+.legend-swatch {
+  width: 18px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.35);
+}
+
+/* =========================
+   LOCAL MAP MARKERS
+========================= */
+
+.marker-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 10px #000;
+  background: #1261a6;
+  font-size: 16px;
+}
+
+.marker-icon.energy {
+  background: #b48a12;
+}
+
+.marker-icon.industry {
+  background: #326ca0;
+}
+
+.marker-icon.port {
+  background: #1c6bb1;
+}
+
+.marker-icon.capital {
+  background: #bca14d;
+}
+
+.marker-icon.farm {
+  background: #4b9a4e;
+}
+
+.marker-icon.military {
+  background: #9b313f;
+}
+
+/* =========================
+   DATA ROWS / TABLES
+========================= */
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 6px 0;
+  font-size: 12px;
+}
+
+.row span:first-child {
+  color: #bed5ec;
+}
+
+.value,
+.row span:last-child {
+  font-weight: 900;
+}
+
+.green {
+  color: #65e887;
+}
+
+.red {
+  color: #ff7b8a;
+}
+
+.yellow {
+  color: #ffe083;
+}
+
+.blue {
+  color: #8fd1ff;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.tabs button {
+  font-size: 11px;
+  padding: 6px 9px;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th,
+td {
+  padding: 7px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  color: #9ecbff;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 7px;
+  border: 1px solid #2d5b89;
+  border-radius: 999px;
+  background: #0a2038;
+}
+
+/* =========================
+   PROGRESS / EVENTS
+========================= */
+
+.progress {
+  height: 8px;
+  background: #14304f;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #17b4ff, #55e680);
+}
+
+.event {
+  display: grid;
+  grid-template-columns: 34px 58px 1fr;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 7px;
+  margin-bottom: 6px;
+  background: #06182a;
+}
+
+.event-icon {
+  font-size: 26px;
+  text-align: center;
+}
+
+.event-time {
+  font-size: 12px;
+  color: #9ecbff;
+}
+
+.event-message {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.notice {
+  font-size: 12px;
+  color: #b8c7d8;
+  border: 1px solid #214466;
+  background: #06192a;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+/* =========================
+   RESPONSIVE / iPAD
+========================= */
+
+@media (max-width: 1100px) {
+  body {
+    overflow: auto;
+  }
+
+  #topbar {
+    position: relative;
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .global-kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #main-nav {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 8px;
+    height: auto;
+    flex-wrap: wrap;
+  }
+
+  #desktop {
+    position: relative;
+    top: 0;
+    height: auto;
+    overflow: visible;
+  }
+
+  .window {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: auto !important;
+    height: 500px !important;
+    margin-bottom: 10px;
+    resize: none;
+  }
+
+  #country-panel,
+  #build-panel,
+  #events-panel,
+  #economy-panel {
+    height: auto !important;
+  }
+}
