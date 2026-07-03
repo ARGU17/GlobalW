@@ -1,0 +1,300 @@
+{
+  "industrial": [
+    {
+      "id": "advanced_manufacturing",
+      "name": "Fabricación avanzada",
+      "era": "Era digital",
+      "year": 2026,
+      "cost": 120000000,
+      "days": 180,
+      "requiredResearch": 900,
+      "effects": {
+        "industrialOutputMultiplier": 1.06,
+        "constructionCostMultiplier": 0.97,
+        "gdpBonus": 85000000
+      },
+      "description": "Mejora la productividad industrial y reduce ligeramente el coste de nuevas fábricas."
+    },
+    {
+      "id": "robotized_factories",
+      "name": "Fábricas robotizadas",
+      "era": "Era digital",
+      "year": 2028,
+      "cost": 220000000,
+      "days": 270,
+      "requiredResearch": 1500,
+      "effects": {
+        "industrialOutputMultiplier": 1.12,
+        "jobsMultiplier": 0.92,
+        "energyDemandMultiplier": 1.04
+      },
+      "description": "Aumenta producción industrial, reduce necesidad de mano de obra y eleva demanda eléctrica."
+    },
+    {
+      "id": "circular_industry",
+      "name": "Industria circular",
+      "era": "Transición climática",
+      "year": 2030,
+      "cost": 260000000,
+      "days": 300,
+      "requiredResearch": 1800,
+      "effects": {
+        "co2Multiplier": 0.92,
+        "importsMultiplier": 0.97,
+        "stabilityBonus": 0.4
+      },
+      "description": "Reduce emisiones industriales y dependencia de materias primas importadas."
+    }
+  ],
+  "energy": [
+    {
+      "id": "grid_storage",
+      "name": "Almacenamiento de red",
+      "era": "Era digital",
+      "year": 2026,
+      "cost": 180000000,
+      "days": 220,
+      "requiredResearch": 1000,
+      "effects": {
+        "installedPowerBonusMW": 120,
+        "energyStabilityBonus": 0.8,
+        "renewableEfficiencyMultiplier": 1.08
+      },
+      "description": "Permite integrar más renovables y estabiliza la red eléctrica nacional."
+    },
+    {
+      "id": "next_gen_wind",
+      "name": "Eólica de nueva generación",
+      "era": "Transición climática",
+      "year": 2029,
+      "cost": 210000000,
+      "days": 260,
+      "requiredResearch": 1400,
+      "effects": {
+        "windEnergyMultiplier": 1.18,
+        "co2Reduction": 2200000
+      },
+      "description": "Mejora la producción de parques eólicos y reduce emisiones nacionales."
+    },
+    {
+      "id": "small_modular_reactors",
+      "name": "Reactores modulares pequeños",
+      "era": "Futuro cercano",
+      "year": 2034,
+      "cost": 650000000,
+      "days": 540,
+      "requiredResearch": 2800,
+      "effects": {
+        "installedPowerBonusMW": 650,
+        "energyProductionBonusMW": 600,
+        "co2Reduction": 9000000,
+        "stabilityBonus": 0.6
+      },
+      "description": "Aporta gran potencia firme baja en carbono, con alto coste inicial."
+    },
+    {
+      "id": "green_hydrogen",
+      "name": "Hidrógeno verde",
+      "era": "Transición climática",
+      "year": 2031,
+      "cost": 420000000,
+      "days": 420,
+      "requiredResearch": 2200,
+      "effects": {
+        "industrialCo2Multiplier": 0.9,
+        "exportsBonus": 45000000,
+        "energyDemandBonusMW": 80
+      },
+      "description": "Reduce CO₂ industrial y abre una nueva vía exportadora energética."
+    }
+  ],
+  "digital": [
+    {
+      "id": "national_cloud",
+      "name": "Nube soberana nacional",
+      "era": "Era digital",
+      "year": 2026,
+      "cost": 160000000,
+      "days": 200,
+      "requiredResearch": 950,
+      "effects": {
+        "cyberBonus": 300,
+        "researchBonus": 80,
+        "servicesOutputMultiplier": 1.04
+      },
+      "description": "Refuerza la soberanía digital, el sector servicios y las capacidades cibernéticas."
+    },
+    {
+      "id": "ai_public_administration",
+      "name": "IA en administración pública",
+      "era": "Era digital",
+      "year": 2027,
+      "cost": 190000000,
+      "days": 240,
+      "requiredResearch": 1300,
+      "effects": {
+        "taxEfficiencyMultiplier": 1.04,
+        "publicSpendingMultiplier": 0.98,
+        "stabilityBonus": 0.5
+      },
+      "description": "Mejora eficiencia fiscal, reduce gasto operativo y aumenta estabilidad institucional."
+    },
+    {
+      "id": "quantum_communications",
+      "name": "Comunicaciones cuánticas",
+      "era": "Futuro cercano",
+      "year": 2035,
+      "cost": 520000000,
+      "days": 500,
+      "requiredResearch": 3200,
+      "effects": {
+        "cyberBonus": 1200,
+        "espionageDefenseBonus": 0.18,
+        "researchBonus": 160
+      },
+      "description": "Protege comunicaciones estratégicas y mejora defensa frente a operaciones híbridas."
+    }
+  ],
+  "military": [
+    {
+      "id": "network_centric_warfare",
+      "name": "Guerra en red",
+      "era": "Era digital",
+      "year": 2026,
+      "cost": 240000000,
+      "days": 260,
+      "requiredResearch": 1200,
+      "effects": {
+        "militaryMultiplier": 1.08,
+        "cyberBonus": 180,
+        "warRiskReduction": 1.5
+      },
+      "description": "Integra sensores, mando y control para aumentar eficacia militar."
+    },
+    {
+      "id": "drone_swarms",
+      "name": "Enjambres de drones",
+      "era": "Transición climática",
+      "year": 2029,
+      "cost": 310000000,
+      "days": 320,
+      "requiredResearch": 1800,
+      "effects": {
+        "militaryMultiplier": 1.12,
+        "militaryBonus": 18000,
+        "cyberDemand": 120
+      },
+      "description": "Aumenta poder militar mediante sistemas autónomos de bajo coste relativo."
+    },
+    {
+      "id": "integrated_air_defense",
+      "name": "Defensa aérea integrada",
+      "era": "Era digital",
+      "year": 2027,
+      "cost": 360000000,
+      "days": 360,
+      "requiredResearch": 1600,
+      "effects": {
+        "militaryBonus": 25000,
+        "stabilityBonus": 0.8,
+        "warRiskReduction": 4
+      },
+      "description": "Reduce vulnerabilidad aérea y aumenta disuasión estratégica."
+    },
+    {
+      "id": "hypersonic_deterrence",
+      "name": "Disuasión hipersónica",
+      "era": "Futuro cercano",
+      "year": 2036,
+      "cost": 900000000,
+      "days": 720,
+      "requiredResearch": 4200,
+      "effects": {
+        "militaryBonus": 95000,
+        "worldTensionIncrease": 4,
+        "relationPenalty": 2
+      },
+      "description": "Aporta enorme disuasión militar, pero aumenta tensión internacional."
+    }
+  ],
+  "civil": [
+    {
+      "id": "high_speed_rail",
+      "name": "Alta velocidad expandida",
+      "era": "Era digital",
+      "year": 2026,
+      "cost": 380000000,
+      "days": 420,
+      "requiredResearch": 800,
+      "effects": {
+        "gdpBonus": 120000000,
+        "happinessBonus": 1.1,
+        "co2Reduction": 1400000
+      },
+      "description": "Mejora movilidad nacional, productividad y reduce emisiones de transporte."
+    },
+    {
+      "id": "smart_cities",
+      "name": "Ciudades inteligentes",
+      "era": "Era digital",
+      "year": 2028,
+      "cost": 260000000,
+      "days": 300,
+      "requiredResearch": 1350,
+      "effects": {
+        "happinessBonus": 1.4,
+        "energyDemandMultiplier": 0.97,
+        "stabilityBonus": 0.5
+      },
+      "description": "Optimiza servicios urbanos, energía y gestión de infraestructuras."
+    },
+    {
+      "id": "desalination_network",
+      "name": "Red nacional de desalación",
+      "era": "Transición climática",
+      "year": 2030,
+      "cost": 340000000,
+      "days": 360,
+      "requiredResearch": 1500,
+      "effects": {
+        "waterProductionBonus": 1500000,
+        "energyDemandBonusMW": 120,
+        "climateRiskReduction": 4
+      },
+      "description": "Aumenta disponibilidad de agua en países vulnerables a sequía."
+    }
+  ],
+  "space": [
+    {
+      "id": "earth_observation_satellites",
+      "name": "Satélites de observación terrestre",
+      "era": "Era digital",
+      "year": 2027,
+      "cost": 280000000,
+      "days": 320,
+      "requiredResearch": 1500,
+      "effects": {
+        "climateRiskReduction": 2,
+        "militaryBonus": 6000,
+        "researchBonus": 90
+      },
+      "description": "Mejora vigilancia climática, militar e inteligencia económica."
+    },
+    {
+      "id": "sovereign_launch_capability",
+      "name": "Capacidad soberana de lanzamiento",
+      "era": "Futuro cercano",
+      "year": 2033,
+      "cost": 850000000,
+      "days": 720,
+      "requiredResearch": 3600,
+      "effects": {
+        "researchBonus": 260,
+        "exportsBonus": 65000000,
+        "militaryBonus": 22000,
+        "reputationBonus": 2
+      },
+      "description": "Permite acceder al espacio sin depender de terceros y abre industria espacial."
+    }
+  ]
+}
