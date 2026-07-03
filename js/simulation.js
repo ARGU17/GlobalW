@@ -20,6 +20,7 @@ function simulateOneDay() {
 
   simulateSelectedCountry(country);
   simulateConstructionQueue(country);
+  simulateMilitaryProductionQueue(country);
   simulateForeignCountries();
   simulateMarkets();
   simulateClimateSystem();
