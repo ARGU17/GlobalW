@@ -632,3 +632,148 @@ th {
     height: auto !important;
   }
 }
+
+/* =========================================================
+   NEXUS RTS — FIXED DASHBOARD LAYOUT V2
+   ========================================================= */
+
+:root {
+  --topbar-height: 132px;
+}
+
+body {
+  overflow: hidden;
+}
+
+#topbar {
+  height: var(--topbar-height);
+  grid-template-columns: 250px 1fr 235px;
+}
+
+#main-nav {
+  display: none;
+}
+
+.global-kpis {
+  grid-template-columns: repeat(10, minmax(105px, 1fr));
+}
+
+.kpi {
+  height: 116px;
+}
+
+.kpi-value {
+  font-size: 15px;
+}
+
+.kpi-rank {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #9ecbff;
+}
+
+#desktop {
+  top: var(--topbar-height);
+  display: grid;
+  grid-template-columns: 260px minmax(620px, 1fr) 440px 360px;
+  grid-template-rows: calc(56vh - 70px) calc(44vh - 70px);
+  grid-template-areas:
+    "country world build events"
+    "country local economy events";
+  gap: 10px;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.window {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  resize: none !important;
+  min-width: 0;
+  min-height: 0;
+}
+
+.window-title {
+  cursor: default;
+}
+
+.drag-hint {
+  display: none;
+}
+
+#country-panel { grid-area: country; }
+#world-map-panel { grid-area: world; }
+#build-panel { grid-area: build; }
+#local-map-panel { grid-area: local; }
+#economy-panel { grid-area: economy; }
+#events-panel { grid-area: events; }
+
+.window-content,
+.map-window-content {
+  overflow: hidden;
+}
+
+#country-content,
+#build-content,
+#economy-content,
+#events-content {
+  height: calc(100% - 28px);
+  overflow: auto;
+}
+
+#build-content .table-wrap {
+  max-height: none;
+  overflow: visible;
+}
+
+#build-content table {
+  table-layout: fixed;
+}
+
+#build-content th,
+#build-content td {
+  white-space: normal;
+  vertical-align: middle;
+}
+
+#world-map,
+#local-map {
+  height: 100%;
+}
+
+@media (max-width: 1200px) {
+  body {
+    overflow: auto;
+  }
+
+  #topbar {
+    position: relative;
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .global-kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #desktop {
+    position: relative;
+    top: 0;
+    display: block;
+    overflow: visible;
+  }
+
+  .window {
+    height: auto !important;
+    min-height: 420px;
+    margin-bottom: 10px;
+  }
+
+  #world-map-panel,
+  #local-map-panel {
+    height: 520px !important;
+  }
+}
