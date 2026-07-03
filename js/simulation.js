@@ -728,6 +728,67 @@ function calculateDailyCyberDelta(country) {
 }
 
 /* =========================================================
+   MILITARY
+========================================================= */
+function startMilitaryProduction(unitId, quantity = 1) {
+  const country = getSelectedCountry();
+  const unit = MILITARY_UNITS.find(u => u.id === unitId);
+
+  if (!unit) return;
+
+  const totalCost = unit.cost * quantity;
+
+  if (country.treasury < totalCost) {
+    addEvent("⛔", `Tesorería insuficiente para producir ${unit.name}.`);
+    renderAll();
+    return;
+  }
+
+  country.treasury -= totalCost;
+
+  country.militaryQueue ??= [];
+  country.units ??= {};
+
+  country.militaryQueue.push({
+    id: String(Date.now() + Math.random()),
+    unitId,
+    name: unit.name,
+    icon: unit.icon,
+    quantity,
+    remainingDays: unit.days,
+    totalDays: unit.days,
+    cost: totalCost
+  });
+
+  addEvent("🏭", `Producción militar iniciada: ${quantity} × ${unit.name}.`);
+  renderAll();
+}
+
+function simulateMilitaryProductionQueue(country) {
+  country.militaryQueue ??= [];
+  country.units ??= {};
+
+  country.militaryQueue.forEach(project => {
+    project.remainingDays -= 1;
+  });
+
+  const completed = country.militaryQueue.filter(p => p.remainingDays <= 0);
+
+  country.militaryQueue = country.militaryQueue.filter(p => p.remainingDays > 0);
+
+  completed.forEach(project => {
+    const unit = MILITARY_UNITS.find(u => u.id === project.unitId);
+    if (!unit) return;
+
+    country.units[unit.id] = (country.units[unit.id] || 0) + project.quantity;
+    country.military += unit.power * project.quantity;
+
+    addEvent("✅", `${country.name} completa ${project.quantity} × ${unit.name}.`);
+  });
+}
+
+
+/* =========================================================
    EXPORT GLOBAL
 ========================================================= */
 
@@ -758,3 +819,7 @@ window.executePolicy = executePolicy;
 window.simulateMarkets = simulateMarkets;
 
 window.calculateDailyCyberDelta = calculateDailyCyberDelta;
+
+window.startMilitaryProduction = startMilitaryProduction;
+window.simulateMilitaryProductionQueue = simulateMilitaryProductionQueue;
+
