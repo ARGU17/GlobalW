@@ -395,6 +395,25 @@ function handleButtonClick(button) {
       executePolicy(button.dataset.policy);
     }
   }
+  if (button.dataset.unitProduce) {
+  const qty = Number(localStorage.getItem(`qty_${button.dataset.unitProduce}`) || 1);
+  startMilitaryProduction(button.dataset.unitProduce, qty);
+}
+
+if (button.dataset.unitPlus) {
+  const key = `qty_${button.dataset.unitPlus}`;
+  const current = Number(localStorage.getItem(key) || 1);
+  localStorage.setItem(key, Math.min(99, current + 1));
+  renderAll();
+}
+
+if (button.dataset.unitMinus) {
+  const key = `qty_${button.dataset.unitMinus}`;
+  const current = Number(localStorage.getItem(key) || 1);
+  localStorage.setItem(key, Math.max(1, current - 1));
+  renderAll();
+}
+  
 }
 
 function handleAction(action) {
