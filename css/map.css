@@ -506,3 +506,36 @@ display:none;
 }
 
 }
+
+
+
+.construction-marker {
+  position: relative;
+  background: #6f4c12 !important;
+  border-color: #ffd166 !important;
+  animation: constructionPulse 1.2s infinite alternate;
+}
+
+.marker-level {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  background: #020617;
+  color: #fff;
+  border: 1px solid #8fd1ff;
+  border-radius: 5px;
+  font-size: 9px;
+  padding: 1px 3px;
+}
+
+@keyframes constructionPulse {
+  from {
+    box-shadow: 0 0 6px #000;
+  }
+  to {
+    box-shadow: 0 0 14px #ffd166;
+  }
+}
+
+
+
