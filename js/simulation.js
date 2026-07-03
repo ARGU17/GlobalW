@@ -714,6 +714,18 @@ function marketNewsEvent() {
   addEvent("📰", msg);
 }
 
+function calculateDailyCyberDelta(country) {
+  const researchEffect = country.research * 0.0008;
+  const stabilityEffect = country.stability > 65 ? 0.08 : -0.03;
+  const fundingEffect = country.treasury > 100_000_000 ? 0.05 : -0.02;
+  const sanctionsEffect = country.sanctions * 0.01;
+
+  return Math.max(
+    0,
+    researchEffect + stabilityEffect + fundingEffect - sanctionsEffect
+  );
+}
+
 /* =========================================================
    EXPORT GLOBAL
 ========================================================= */
@@ -743,3 +755,5 @@ window.findRegion = findRegion;
 
 window.executePolicy = executePolicy;
 window.simulateMarkets = simulateMarkets;
+
+window.calculateDailyCyberDelta = calculateDailyCyberDelta;
