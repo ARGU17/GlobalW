@@ -43,59 +43,70 @@ function renderTopBar() {
 
 function renderGlobalKPIs(country) {
   const container = document.getElementById("global-kpis");
-
   if (!container || !country) return;
+
+  const countries = NEXUS.state.countries;
 
   const data = [
     {
       label: "💰 Tesorería",
       value: formatEuro(country.treasury),
-      detail: `${formatEuro(calculateDailyFiscalBalance(country))}/día`
+      detail: `${formatEuro(calculateDailyFiscalBalance(country))}/día`,
+      rank: rankBy(countries, "treasury")
     },
     {
       label: "📊 PIB",
       value: formatEuro(country.gdp),
-      detail: `${formatEuro(calculateDailyGDPDelta(country))}/día`
+      detail: `${formatEuro(calculateDailyGDPDelta(country))}/día`,
+      rank: rankBy(countries, "gdp")
     },
     {
       label: "👥 Población",
       value: formatNumber(country.population),
-      detail: `${formatNumber(calculateDailyPopulationDelta(country))}/día`
+      detail: `${formatNumber(calculateDailyPopulationDelta(country))}/día`,
+      rank: rankBy(countries, "population")
     },
     {
       label: "⚡ Energía",
       value: `${formatNumber(country.energyProduction)} MW`,
-      detail: `Inst. ${formatNumber(country.installedPower)} MW`
+      detail: `Inst. ${formatNumber(country.installedPower)} MW`,
+      rank: rankBy(countries, "energyProduction")
     },
     {
       label: "🏭 Industria",
       value: `Nivel ${getIndustrialLevel(country)}`,
-      detail: `Índice ${getIndustrialIndex(country).toFixed(1)}`
+      detail: `Índice ${getIndustrialIndex(country).toFixed(1)}`,
+      rank: rankBy(countries, "gdp")
     },
     {
-      label: "🛡️ Militar",
+      label: "🛡 Militar",
       value: formatNumber(country.military),
-      detail: `Ranking ${country.powerRank || "-"}º`
+      detail: `Poder estratégico`,
+      rank: rankBy(countries, "military")
     },
     {
       label: "🙂 Felicidad",
       value: `${country.happiness.toFixed(1)}/100`,
-      detail: `${signed(calculateDailyHappinessDelta(country), 3)}/día`
+      detail: `${signed(calculateDailyHappinessDelta(country), 3)}/día`,
+      rank: rankBy(countries, "happiness")
     },
     {
       label: "🧱 Estabilidad",
       value: `${country.stability.toFixed(1)}/100`,
-      detail: `${signed(calculateDailyStabilityDelta(country), 3)}/día`
+      detail: `${signed(calculateDailyStabilityDelta(country), 3)}/día`,
+      rank: rankBy(countries, "stability")
     },
     {
       label: "🌿 CO₂ país",
       value: `${formatNumber(country.co2)} t`,
-      detail: `Atm. ${getGlobalCO2PPM().toFixed(1)} ppm`
+      detail: `Atm. ${getGlobalCO2PPM().toFixed(1)} ppm`,
+      rank: rankBy(countries, "co2", true)
     },
     {
-      label: "⚗️ Investigación",
+      label: "⚗ Investigación",
       value: formatNumber(country.research),
-      detail: `Cyber ${formatNumber(country.cyber)}`
+      detail: `Cyber ${formatNumber(country.cyber)}`,
+      rank: rankBy(countries, "research")
     }
   ];
 
@@ -104,8 +115,19 @@ function renderGlobalKPIs(country) {
       <div class="kpi-label">${item.label}</div>
       <div class="kpi-value">${item.value}</div>
       <div class="kpi-detail">${item.detail}</div>
+      <div class="kpi-rank">Ranking mundial: ${item.rank}º</div>
     </div>
   `).join("");
+}
+
+function rankBy(countries, key, ascending = false) {
+  const selected = getSelectedCountry();
+
+  const sorted = [...countries].sort((a, b) => {
+    return ascending ? a[key] - b[key] : b[key] - a[key];
+  });
+
+  return sorted.findIndex(c => c.name === selected.name) + 1;
 }
 
 function renderClock() {
