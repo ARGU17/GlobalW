@@ -484,7 +484,6 @@ function renderWorldMarkers() {
 /* =========================================================
    MAPA LOCAL DEL PAÍS
 ========================================================= */
-
 function renderLocalMap() {
   if (!LOCAL_MAP) return;
 
@@ -500,35 +499,86 @@ function renderLocalMap() {
   }
 
   country.regions.forEach(region => {
-    const building = findBuildingById(region.buildingId);
-    const markerClass = getRegionMarkerClass(region);
-    const markerIcon = building ? building.icon : getRegionIcon(region);
+    renderRegionMainMarker(region);
+    renderRegionConstructionMarkers(country, region);
+  });
+}
+
+function renderRegionMainMarker(region) {
+  const building = findBuildingById(region.buildingId);
+  const markerClass = getRegionMarkerClass(region);
+  const markerIcon = building ? building.icon : getRegionIcon(region);
+
+  const icon = L.divIcon({
+    className: "",
+    html: `<div class="marker-icon ${markerClass}">${markerIcon}</div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15]
+  });
+
+  const marker = L.marker([region.lat, region.lon], { icon })
+    .addTo(LOCAL_MAP)
+    .bindTooltip(
+      `${region.name}<br>${building ? building.name : "Nodo disponible"}<br>Nivel ${region.level}`,
+      {
+        permanent: true,
+        direction: "top",
+        offset: [0, -12]
+      }
+    );
+
+  marker.on("click", () => openRegionPopup(region));
+
+  LOCAL_MARKERS.push(marker);
+}
+
+function renderRegionConstructionMarkers(country, region) {
+  const projects = (country.constructionQueue || []).filter(
+    project => project.regionId === region.id
+  );
+
+  projects.forEach((project, index) => {
+    const building = findBuildingById(project.buildingId);
+    if (!building) return;
+
+    const pos = offsetLatLng(region.lat, region.lon, index + 1);
 
     const icon = L.divIcon({
       className: "",
-      html: `<div class="marker-icon ${markerClass}">${markerIcon}</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
+      html: `
+        <div class="marker-icon construction-marker">
+          ${building.icon}
+          <span class="marker-level">L${project.targetLevel}</span>
+        </div>
+      `,
+      iconSize: [34, 34],
+      iconAnchor: [17, 17]
     });
 
-    const marker = L.marker([region.lat, region.lon], { icon })
+    const marker = L.marker(pos, { icon })
       .addTo(LOCAL_MAP)
       .bindTooltip(
-        `${region.name}<br>Nivel ${region.level}`,
+        `${project.buildingName}<br>En construcción<br>${project.remainingDays} días restantes`,
         {
-          permanent: true,
-          direction: "top",
-          offset: [0, -12]
+          permanent: false,
+          direction: "top"
         }
       );
-
-    marker.on("click", () => {
-      openRegionPopup(region);
-    });
 
     LOCAL_MARKERS.push(marker);
   });
 }
+
+function offsetLatLng(lat, lon, index) {
+  const angle = index * 1.256;
+  const radius = 0.12 + index * 0.025;
+
+  return [
+    lat + Math.sin(angle) * radius,
+    lon + Math.cos(angle) * radius
+  ];
+}
+
 
 function getRegionMarkerClass(region) {
   switch (region.type) {
