@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>NEXUS RTS — Simulación Geopolítica Moderna</title>
 
-  <!-- Leaflet: mapas reales OpenStreetMap -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIINfQkiuI8R6Bf3q5g6xVZtNFu4DlXhQ="
     crossorigin=""
   />
 
-  <!-- Estilos propios -->
   <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/windows.css" />
+  <link rel="stylesheet" href="./css/map.css" />
+  <link rel="stylesheet" href="./css/components.css" />
 </head>
 
 <body>
-  <!-- Barra superior fija -->
   <header id="topbar">
     <section class="brand">
       <div class="brand-icon">🌐</div>
@@ -29,15 +27,13 @@
       </div>
     </section>
 
-    <section id="global-kpis" class="global-kpis">
-      <!-- Renderizado desde ui.js -->
-    </section>
+    <section id="global-kpis" class="global-kpis"></section>
 
     <section class="time-panel">
       <div>
-        <div id="sim-date" class="sim-date">3 julio 2026</div>
-        <div id="sim-time" class="sim-time">14:35:22</div>
-        <div id="sim-status" class="sim-status">En curso</div>
+        <div id="sim-date" class="sim-date"></div>
+        <div id="sim-time" class="sim-time"></div>
+        <div id="sim-status" class="sim-status"></div>
       </div>
 
       <div class="speed-controls">
@@ -50,7 +46,6 @@
     </section>
   </header>
 
-  <!-- Navegación principal -->
   <nav id="main-nav">
     <button data-focus-panel="world-map-panel" class="active">🌍 Mapa Mundial</button>
     <button data-focus-panel="local-map-panel">🗺 Vista Local</button>
@@ -63,10 +58,8 @@
     <button data-action="reset-game" class="danger">♻ Reiniciar</button>
   </nav>
 
-  <!-- Escritorio principal -->
   <main id="desktop">
-    <!-- País seleccionado -->
-    <section id="country-panel" class="window" style="left: 8px; top: 8px; width: 300px; height: 560px;">
+    <section id="country-panel" class="window">
       <div class="window-title">
         <span>País seleccionado</span>
         <span class="drag-hint">↕</span>
@@ -74,8 +67,7 @@
       <div id="country-content" class="window-content"></div>
     </section>
 
-    <!-- Mapa mundial real -->
-    <section id="world-map-panel" class="window" style="left: 318px; top: 8px; width: 850px; height: 560px;">
+    <section id="world-map-panel" class="window">
       <div class="window-title">
         <span>Mapa geopolítico mundial</span>
         <span class="drag-hint">↕</span>
@@ -84,13 +76,8 @@
       <div class="map-window-content">
         <div id="world-map"></div>
 
-        <div id="world-map-legend" class="map-overlay map-legend">
-          <!-- Renderizado desde maps.js -->
-        </div>
-
-        <div id="world-map-layers" class="map-overlay map-layers">
-          <!-- Renderizado desde maps.js -->
-        </div>
+        <div id="world-map-legend" class="map-overlay map-legend"></div>
+        <div id="world-map-layers" class="map-overlay map-layers"></div>
 
         <div class="map-overlay country-search">
           <select id="country-selector"></select>
@@ -98,8 +85,7 @@
       </div>
     </section>
 
-    <!-- Construcción -->
-    <section id="build-panel" class="window" style="left: 1178px; top: 8px; width: 380px; height: 560px;">
+    <section id="build-panel" class="window">
       <div class="window-title">
         <span>Construir / mejorar</span>
         <span class="drag-hint">↕</span>
@@ -107,8 +93,7 @@
       <div id="build-content" class="window-content"></div>
     </section>
 
-    <!-- Vista local real del país seleccionado -->
-    <section id="local-map-panel" class="window" style="left: 318px; top: 578px; width: 850px; height: 385px;">
+    <section id="local-map-panel" class="window">
       <div class="window-title">
         <span>Vista local del país seleccionado</span>
         <span class="drag-hint">↕</span>
@@ -118,8 +103,7 @@
       </div>
     </section>
 
-    <!-- Economía / datos globales -->
-    <section id="economy-panel" class="window" style="left: 1178px; top: 578px; width: 380px; height: 385px;">
+    <section id="economy-panel" class="window">
       <div class="window-title">
         <span>Economía y datos globales</span>
         <span class="drag-hint">↕</span>
@@ -127,8 +111,7 @@
       <div id="economy-content" class="window-content"></div>
     </section>
 
-    <!-- Eventos -->
-    <section id="events-panel" class="window" style="left: 8px; top: 578px; width: 300px; height: 385px;">
+    <section id="events-panel" class="window">
       <div class="window-title">
         <span>Eventos recientes</span>
         <span class="drag-hint">↕</span>
@@ -137,16 +120,16 @@
     </section>
   </main>
 
-  <!-- Leaflet JS -->
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin="">
   </script>
 
-  <!-- Módulos del juego -->
   <script src="./js/data.js"></script>
   <script src="./js/simulation.js"></script>
+  <script src="./js/economy.js"></script>
+  <script src="./js/ai.js"></script>
+  <script src="./js/diplomacy.js"></script>
   <script src="./js/maps.js"></script>
   <script src="./js/ui.js"></script>
   <script src="./js/main.js"></script>
