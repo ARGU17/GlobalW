@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>NEXUS RTS — Simulación Geopolítica Moderna</title>
 
   <link
@@ -11,10 +12,10 @@
     crossorigin=""
   />
 
-<link rel="stylesheet" href="./css/style.css" />
-<link rel="stylesheet" href="./css/windows.css" />
-<link rel="stylesheet" href="./css/map.css" />
-<link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/windows.css" />
+  <link rel="stylesheet" href="./css/map.css" />
+  <link rel="stylesheet" href="./css/components.css" />
 </head>
 
 <body>
@@ -38,31 +39,19 @@
 
       <div class="speed-controls">
         <button data-action="toggle-pause" id="pause-button">⏸</button>
-        <button data-speed="1">x1</button>
+        <button data-speed="0.5">x0.5</button>
+        <button data-speed="1" class="active">x1</button>
         <button data-speed="3">x3</button>
-        <button data-speed="7" class="active">x7</button>
+        <button data-speed="7">x7</button>
         <button data-speed="30">x30</button>
       </div>
     </section>
   </header>
 
-  <nav id="main-nav">
-    <button data-focus-panel="world-map-panel" class="active">🌍 Mapa Mundial</button>
-    <button data-focus-panel="local-map-panel">🗺 Vista Local</button>
-    <button data-focus-panel="country-panel">🏛 País</button>
-    <button data-focus-panel="build-panel">🏗 Construcción</button>
-    <button data-focus-panel="economy-panel">📊 Economía</button>
-    <button data-focus-panel="events-panel">📰 Eventos</button>
-    <button data-action="save-game">💾 Guardar</button>
-    <button data-action="load-game">📂 Cargar</button>
-    <button data-action="reset-game" class="danger">♻ Reiniciar</button>
-  </nav>
-
   <main id="desktop">
     <section id="country-panel" class="window">
       <div class="window-title">
         <span>País seleccionado</span>
-        <span class="drag-hint">↕</span>
       </div>
       <div id="country-content" class="window-content"></div>
     </section>
@@ -70,12 +59,10 @@
     <section id="world-map-panel" class="window">
       <div class="window-title">
         <span>Mapa geopolítico mundial</span>
-        <span class="drag-hint">↕</span>
       </div>
 
       <div class="map-window-content">
         <div id="world-map"></div>
-
         <div id="world-map-legend" class="map-overlay map-legend"></div>
         <div id="world-map-layers" class="map-overlay map-layers"></div>
 
@@ -87,8 +74,7 @@
 
     <section id="build-panel" class="window">
       <div class="window-title">
-        <span>Construir / mejorar</span>
-        <span class="drag-hint">↕</span>
+        <span>Construir / mejorar / producir</span>
       </div>
       <div id="build-content" class="window-content"></div>
     </section>
@@ -96,7 +82,6 @@
     <section id="local-map-panel" class="window">
       <div class="window-title">
         <span>Vista local del país seleccionado</span>
-        <span class="drag-hint">↕</span>
       </div>
       <div class="map-window-content">
         <div id="local-map"></div>
@@ -105,8 +90,7 @@
 
     <section id="economy-panel" class="window">
       <div class="window-title">
-        <span>Economía y datos globales</span>
-        <span class="drag-hint">↕</span>
+        <span>Economía · bolsa · política · operaciones</span>
       </div>
       <div id="economy-content" class="window-content"></div>
     </section>
@@ -114,7 +98,6 @@
     <section id="events-panel" class="window">
       <div class="window-title">
         <span>Eventos recientes</span>
-        <span class="drag-hint">↕</span>
       </div>
       <div id="events-content" class="window-content"></div>
     </section>
@@ -125,13 +108,13 @@
     crossorigin="">
   </script>
 
-<script src="./js/data.js"></script>
-<script src="./js/simulation.js"></script>
-<script src="./js/economy.js"></script>
-<script src="./js/ai.js"></script>
-<script src="./js/diplomacy.js"></script>
-<script src="./js/maps.js"></script>
-<script src="./js/ui.js"></script>
-<script src="./js/main.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/simulation.js"></script>
+  <script src="./js/economy.js"></script>
+  <script src="./js/ai.js"></script>
+  <script src="./js/diplomacy.js"></script>
+  <script src="./js/maps.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/main.js"></script>
 </body>
 </html>
