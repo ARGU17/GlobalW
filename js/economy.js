@@ -24,7 +24,7 @@ window.NEXUS_ECONOMY = (() => {
     }));
 
     const state = {
-      version: "1.0.0-alpha",
+      version: "1.0.1-alpha",
       date: "2028-01-01",
       monthIndex: 0,
       running: false,

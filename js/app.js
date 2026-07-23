@@ -1,13 +1,13 @@
 "use strict";
 
 (() => {
-  const SAVE_KEY = "nexus_alpha_v1_save";
+  const SAVE_KEY = "nexus_alpha_v1_0_1_save";
   let state;
   let timer = null;
 
   function boot() {
     try {
-      state = loadState() || NEXUS_ECONOMY.createInitialState();
+      state = normalizeLoadedState(loadState()) || NEXUS_ECONOMY.createInitialState();
       window.NEXUS_STATE = state;
       NEXUS_UI.initialize(state, createActions());
       NEXUS_MAP_ENGINE.initialize(state, {
@@ -20,8 +20,14 @@
       hideBootLoader();
     } catch (error) {
       console.error("NEXUS boot error", error);
-      document.getElementById("bootError").hidden = false;
-      document.getElementById("bootErrorText").textContent = error.message;
+      const loader = document.getElementById("bootLoader");
+      if (loader) loader.remove();
+      const startOverlay = document.getElementById("startOverlay");
+      if (startOverlay) startOverlay.hidden = true;
+      const errorPanel = document.getElementById("bootError");
+      const errorText = document.getElementById("bootErrorText");
+      if (errorPanel) errorPanel.hidden = false;
+      if (errorText) errorText.textContent = error?.message || String(error);
     }
   }
 
@@ -55,7 +61,7 @@
     const overlay = document.getElementById("startOverlay");
     const startSpain = document.getElementById("startSpainBtn");
     const continueBtn = document.getElementById("continueBtn");
-    const hasSave = Boolean(localStorage.getItem(SAVE_KEY));
+    const hasSave = Boolean(normalizeLoadedState(loadState()));
     continueBtn.hidden = !hasSave;
     startSpain.addEventListener("click", () => {
       state = NEXUS_ECONOMY.createInitialState();
@@ -65,7 +71,7 @@
       NEXUS_UI.toast("Campaña iniciada con España reforzada.", "success");
     });
     continueBtn.addEventListener("click", () => {
-      const loaded = loadState();
+      const loaded = normalizeLoadedState(loadState());
       if (loaded) {
         state = loaded;
         window.NEXUS_STATE = state;
@@ -226,8 +232,82 @@
     }
   }
 
+  function normalizeLoadedState(candidate) {
+    if (!candidate || typeof candidate !== "object") return null;
+    if (!Array.isArray(candidate.countries) || !Array.isArray(candidate.regions)) return null;
+
+    const fresh = NEXUS_ECONOMY.createInitialState();
+    const normalized = {
+      ...fresh,
+      ...candidate,
+      settings: { ...fresh.settings, ...(candidate.settings || {}) },
+      events: Array.isArray(candidate.events) ? candidate.events : fresh.events,
+      notifications: Array.isArray(candidate.notifications) ? candidate.notifications : [],
+      nationalProjects: fresh.nationalProjects,
+      unitCatalog: fresh.unitCatalog
+    };
+
+    normalized.countries = fresh.countries.map(base => {
+      const saved = candidate.countries.find(item => item?.id === base.id);
+      if (!saved) return base;
+      return {
+        ...base,
+        ...saved,
+        economy: { ...base.economy, ...(saved.economy || {}) },
+        systems: { ...base.systems, ...(saved.systems || {}) },
+        budgets: { ...base.budgets, ...(saved.budgets || {}) },
+        history: {
+          ...base.history,
+          ...(saved.history || {}),
+          gdp: Array.isArray(saved.history?.gdp) ? saved.history.gdp : base.history.gdp,
+          inflation: Array.isArray(saved.history?.inflation) ? saved.history.inflation : base.history.inflation,
+          unemployment: Array.isArray(saved.history?.unemployment) ? saved.history.unemployment : base.history.unemployment,
+          treasury: Array.isArray(saved.history?.treasury) ? saved.history.treasury : base.history.treasury
+        },
+        relations: { ...base.relations, ...(saved.relations || {}) },
+        sanctions: Array.isArray(saved.sanctions) ? saved.sanctions : [],
+        treaties: Array.isArray(saved.treaties) ? saved.treaties : [],
+        projects: Array.isArray(saved.projects) ? saved.projects : [],
+        units: Array.isArray(saved.units) ? saved.units : [],
+        productionQueue: Array.isArray(saved.productionQueue) ? saved.productionQueue : [],
+        regionInvestments: saved.regionInvestments && typeof saved.regionInvestments === "object" ? saved.regionInvestments : {}
+      };
+    });
+
+    normalized.regions = fresh.regions.map(base => ({
+      ...base,
+      ...(candidate.regions.find(item => item?.id === base.id) || {})
+    }));
+
+    normalized.companies = fresh.companies.map(base => {
+      const saved = Array.isArray(candidate.companies)
+        ? candidate.companies.find(item => item?.id === base.id)
+        : null;
+      return saved ? {
+        ...base,
+        ...saved,
+        history: Array.isArray(saved.history) ? saved.history : base.history,
+        ownership: { ...base.ownership, ...(saved.ownership || {}) }
+      } : base;
+    });
+
+    if (!normalized.countries.some(country => country.id === normalized.selectedCountryId)) {
+      normalized.selectedCountryId = "ESP";
+    }
+    if (!normalized.regions.some(region => region.id === normalized.selectedRegionId)) {
+      normalized.selectedRegionId = "MAD";
+    }
+    if (!["world", "regions"].includes(normalized.mapMode)) normalized.mapMode = "world";
+    if (!["overview", "economy", "regions", "industry", "military", "diplomacy", "events", "settings"].includes(normalized.activePanel)) {
+      normalized.activePanel = "overview";
+    }
+    normalized.speed = [1, 2, 4].includes(Number(normalized.speed)) ? Number(normalized.speed) : 1;
+    normalized.running = Boolean(normalized.running);
+    return normalized;
+  }
+
   function manualLoad() {
-    const loaded = loadState();
+    const loaded = normalizeLoadedState(loadState());
     if (!loaded) {
       NEXUS_UI.toast("No existe una partida guardada.", "warning");
       return;
@@ -252,8 +332,9 @@
   function importSave(raw) {
     try {
       const parsed = JSON.parse(raw);
-      if (!parsed.countries || !parsed.regions || !parsed.version) throw new Error("Formato incompatible");
-      state = parsed;
+      const normalized = normalizeLoadedState(parsed);
+      if (!normalized) throw new Error("Formato incompatible");
+      state = normalized;
       window.NEXUS_STATE = state;
       rebindState();
       saveState(false);
@@ -282,6 +363,7 @@
 
   function hideBootLoader() {
     const loader = document.getElementById("bootLoader");
+    if (!loader) return;
     requestAnimationFrame(() => loader.classList.add("hidden"));
     setTimeout(() => loader.remove(), 500);
   }
