@@ -1,908 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
-
-<title>NEXUS GLOBAL</title>
-
-<meta name="description"
-      content="Simulador Geopolítico Mundial en Tiempo Real">
-
-<link rel="icon" href="assets/icon.png">
-
-<link rel="stylesheet" href="css/style.css">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet">
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <title>NEXUS Global · Alpha v1.0</title>
+  <meta name="description" content="Alpha jugable de simulación geopolítica y económica centrada en una España reforzada.">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
+  <div id="bootLoader" class="boot-loader">
+    <div class="boot-mark">N</div>
+    <div><strong>NEXUS GLOBAL</strong><span>Inicializando Alpha v1.0…</span></div>
+  </div>
 
-<!-- ===================================================== -->
-<!-- PANTALLA DE CARGA                                    -->
-<!-- ===================================================== -->
+  <div id="bootError" class="boot-error" hidden>
+    <h1>Error de arranque</h1>
+    <p id="bootErrorText"></p>
+    <p>Revisa que todos los archivos del ZIP se hayan subido respetando la estructura de carpetas.</p>
+  </div>
 
-<div id="loadingScreen">
-
-    <div class="loadingLogo">
-
-        🌍
-
+  <div id="startOverlay" class="start-overlay">
+    <div class="start-card">
+      <div class="start-brand"><span>N</span><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.0</small></div></div>
+      <div class="start-copy">
+        <span class="eyebrow">Escenario principal</span>
+        <h1>España 2035: potencia industrial europea</h1>
+        <p>Economía reforzada, control territorial, producción de unidades, empresas, OPAs y diplomacia en una Alpha autónoma sin backend.</p>
+      </div>
+      <div class="scenario-card selected">
+        <div class="scenario-flag">🇪🇸</div>
+        <div><h2>España reforzada</h2><p>PIB 2,15 B€, industria 82, logística 88 y 17 regiones gestionables.</p></div>
+        <span>RECOMENDADO</span>
+      </div>
+      <div class="start-actions">
+        <button id="startSpainBtn" class="primary-btn large">Iniciar nueva campaña</button>
+        <button id="continueBtn" class="secondary-btn large">Continuar partida</button>
+        <button id="observerBtn" class="ghost-btn large">Modo observador</button>
+      </div>
+      <p class="start-note">Sin audio. Todo el progreso se guarda localmente en el navegador.</p>
     </div>
+  </div>
 
-    <h1>NEXUS GLOBAL</h1>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block"><div class="brand-mark">N</div><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.0</small></div></div>
+      <div class="topbar-stats">
+        <div><span>FECHA</span><b id="currentDate">—</b></div>
+        <div><span>PAÍS</span><b id="selectedCountryLabel">—</b></div>
+        <div><span>TESORERÍA</span><b id="topTreasury">—</b></div>
+        <div><span>PIB</span><b id="topGDP">—</b></div>
+        <div><span>APROBACIÓN</span><b id="topApproval">—</b></div>
+      </div>
+      <div class="sim-controls">
+        <button id="playPauseBtn" class="primary-btn">▶ Iniciar</button>
+        <button data-speed="1" class="active">x1</button>
+        <button data-speed="2">x2</button>
+        <button data-speed="4">x4</button>
+        <button id="stepBtn" title="Avanzar un mes">+1m</button>
+      </div>
+    </header>
 
-    <div class="loadingBar">
+    <aside class="sidebar">
+      <nav>
+        <span class="nav-section">Gobierno</span>
+        <button data-panel="overview" class="active"><i>⌂</i><span>Resumen</span></button>
+        <button data-panel="economy"><i>€</i><span>Economía</span></button>
+        <button data-panel="regions"><i>▦</i><span>Regiones</span></button>
+        <button data-panel="industry"><i>⌁</i><span>Industria y bolsa</span></button>
+        <span class="nav-section">Estrategia</span>
+        <button data-panel="military"><i>◆</i><span>Fuerzas armadas</span></button>
+        <button data-panel="diplomacy"><i>◎</i><span>Diplomacia</span></button>
+        <button data-panel="events"><i>≋</i><span>Eventos</span></button>
+        <span class="nav-section">Sistema</span>
+        <button data-panel="settings"><i>⚙</i><span>Configuración</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="saveBtn">💾 Guardar</button>
+        <button id="loadBtn">📂 Cargar</button>
+      </div>
+    </aside>
 
-        <div id="loadingProgress"></div>
-
-    </div>
-
-    <div id="loadingText">
-
-        Inicializando simulación...
-
-    </div>
-
-</div>
-
-<!-- ===================================================== -->
-<!-- CONTENEDOR PRINCIPAL                                 -->
-<!-- ===================================================== -->
-
-<div id="gameContainer">
-
-<!-- ===================================================== -->
-<!-- HUD SUPERIOR                                         -->
-<!-- ===================================================== -->
-
-<header id="topHUD">
-
-    <div class="hudLeft">
-
-        <div class="gameTitle">
-
-            🌍 NEXUS GLOBAL
-
+    <main class="main-stage">
+      <section class="map-card">
+        <div class="map-toolbar">
+          <div class="map-mode">
+            <button id="worldModeBtn" class="active">Mundo</button>
+            <button id="regionModeBtn">Regiones de España</button>
+          </div>
+          <select id="countrySelect" aria-label="Seleccionar país"></select>
+          <div class="map-legend"><span><i class="legend-dot strong"></i>Potencia alta</span><span><i class="legend-dot medium"></i>Potencia media</span><span><i class="legend-dot route"></i>Relación activa</span></div>
         </div>
-
-    </div>
-
-    <div class="hudCenter">
-
-        <div class="hudItem">
-
-            📅
-
-            <span id="currentDate">
-
-                01/01/2025
-
-            </span>
-
+        <div class="map-viewport">
+          <svg id="strategicMap" role="img" aria-label="Mapa estratégico interactivo"></svg>
+          <div id="mapTooltip" class="map-tooltip" hidden></div>
         </div>
-
-        <div class="hudItem">
-
-            ⏱
-
-            <span id="simulationSpeed">
-
-                x1
-
-            </span>
-
-        </div>
-
-        <div class="hudItem">
-
-            🌎
-
-            <span id="selectedCountryName">
-
-                Ninguno
-
-            </span>
-
-        </div>
-
-    </div>
-
-    <div class="hudRight">
-
-        <button id="pauseButton">
-
-            ⏸
-
-        </button>
-
-        <button id="speed1Button">
-
-            x1
-
-        </button>
-
-        <button id="speed2Button">
-
-            x2
-
-        </button>
-
-        <button id="speed5Button">
-
-            x5
-
-        </button>
-
-    </div>
-
-</header>
-
-<!-- ===================================================== -->
-<!-- CONTENIDO                                            -->
-<!-- ===================================================== -->
-
-<div id="mainLayout">
-
-<!-- ===================================================== -->
-<!-- MENÚ IZQUIERDO                                       -->
-<!-- ===================================================== -->
-
-<aside id="leftSidebar">
-
-    <h2>
-
-        Gobierno
-
-    </h2>
-
-    <button id="overviewButton">
-
-        📊 Resumen
-
-    </button>
-
-    <button id="economyButton">
-
-        💰 Economía
-
-    </button>
-
-    <button id="industryButton">
-
-        🏭 Industria
-
-    </button>
-
-    <button id="stockButton">
-
-        📈 Bolsa
-
-    </button>
-
-    <button id="technologyButton">
-
-        🔬 Tecnología
-
-    </button>
-
-    <button id="constructionButton">
-
-        🏗 Construcción
-
-    </button>
-
-    <button id="energyButton">
-
-        ⚡ Energía
-
-    </button>
-
-    <button id="resourcesButton">
-
-        ⛏ Recursos
-
-    </button>
-
-    <hr>
-
-    <h2>
-
-        Internacional
-
-    </h2>
-
-    <button id="diplomacyButton">
-
-        🤝 Diplomacia
-
-    </button>
-
-    <button id="tradeButton">
-
-        🚢 Comercio
-
-    </button>
-
-    <button id="intelligenceButton">
-
-        🕵 Inteligencia
-
-    </button>
-
-    <button id="militaryButton">
-
-        🪖 Fuerzas Armadas
-
-    </button>
-
-    <button id="spaceButton">
-
-        🛰 Espacio
-
-    </button>
-
-    <button id="researchButton">
-
-        🧬 Investigación
-
-    </button>
-
-    <hr>
-
-    <button id="settingsButton">
-
-        ⚙ Configuración
-
-    </button>
-
-</aside>
-
-<!-- ===================================================== -->
-<!-- MAPA                                                 -->
-<!-- ===================================================== -->
-
-<main id="mapContainer">
-
-    <canvas id="gameMapCanvas"></canvas>
-
-    <canvas id="effectsCanvas"></canvas>
-
-    <canvas id="uiCanvas"></canvas>
-
-    <div id="selectionRectangle"></div>
-
-    <div id="mapTooltip"></div>
-
-</main>
-
-<!-- ===================================================== -->
-<!-- PANEL DERECHO                                        -->
-<!-- ===================================================== -->
-
-<aside id="rightSidebar">
-
-    <div class="panel">
-
-        <h2>
-
-            País seleccionado
-
-        </h2>
-
-        <div id="countrySummary">
-
-            Selecciona un país.
-
-        </div>
-
-    </div>
-
-    <div class="panel">
-
-        <h2>
-
-            Indicadores
-
-        </h2>
-
-        <table id="countryIndicators">
-
-            <tr>
-
-                <td>PIB</td>
-
-                <td id="gdpValue">-</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Población</td>
-
-                <td id="populationValue">-</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Inflación</td>
-
-                <td id="inflationValue">-</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Desempleo</td>
-
-                <td id="unemploymentValue">-</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Deuda</td>
-
-                <td id="debtValue">-</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Felicidad</td>
-
-                <td id="happinessValue">-</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Estabilidad</td>
-
-                <td id="stabilityValue">-</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Preparación Militar</td>
-
-                <td id="militaryReadinessValue">
-
-                    -
-
-                </td>
-
-            </tr>
-
-        </table>
-
-    </div>
-
-</aside>
-
-</div>
-
-<!-- ===================================================== -->
-<!-- PANEL INFERIOR                                       -->
-<!-- ===================================================== -->
-
-<footer id="bottomPanel">
-
-    <div id="eventTicker">
-
-        Bienvenido a NEXUS GLOBAL
-
-    </div>
-
-    <div id="quickActions">
-
-        <button id="saveButton">
-
-            💾 Guardar
-
-        </button>
-
-        <button id="loadButton">
-
-            📂 Cargar
-
-        </button>
-
-        <button id="editorButton">
-
-            🧭 Editor
-
-        </button>
-
-        <button id="statisticsButton">
-
-            📈 Estadísticas
-
-        </button>
-
-    </div>
-
-</footer>
-
-
-
-<!-- ===================================================== -->
-<!-- VENTANAS DEL JUEGO                                   -->
-<!-- PARTE 2/3                                            -->
-<!-- ===================================================== -->
-
-<!-- ================= ECONOMÍA ================= -->
-
-<section id="economyPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-        <h2>💰 Economía Nacional</h2>
-        <button class="closeWindow">✖</button>
-    </div>
-
-    <div class="windowBody">
-
-        <div id="economyDashboard"></div>
-
-        <canvas id="gdpChart"></canvas>
-
-        <canvas id="inflationChart"></canvas>
-
-        <canvas id="budgetChart"></canvas>
-
-    </div>
-
-</section>
-
-<!-- ================= INDUSTRIA ================= -->
-
-<section id="industryPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-        <h2>🏭 Industria</h2>
-        <button class="closeWindow">✖</button>
-    </div>
-
-    <div class="windowBody">
-
-        <div id="industryList"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= RECURSOS ================= -->
-
-<section id="resourcesPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>⛏ Recursos Naturales</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="resourcesTable"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= ENERGÍA ================= -->
-
-<section id="energyPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>⚡ Energía</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="energyMix"></div>
-
-        <canvas id="energyChart"></canvas>
-
-    </div>
-
-</section>
-
-<!-- ================= BOLSA ================= -->
-
-<section id="stockMarketPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>📈 Bolsa</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="stockCompanies"></div>
-
-        <canvas id="stockChart"></canvas>
-
-    </div>
-
-</section>
-
-<!-- ================= TECNOLOGÍA ================= -->
-
-<section id="technologyPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>🔬 Investigación</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="technologyTree"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= CONSTRUCCIÓN ================= -->
-
-<section id="constructionPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>🏗 Construcción</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="constructionMenu"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= DIPLOMACIA ================= -->
-
-<section id="diplomacyPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>🤝 Diplomacia</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="relationsTable"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= COMERCIO ================= -->
-
-<section id="tradePanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>🚢 Comercio Internacional</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="tradeRoutes"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= MILITAR ================= -->
-
-<section id="militaryPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>🪖 Fuerzas Armadas</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="armySummary"></div>
-
-        <div id="airForceSummary"></div>
-
-        <div id="navySummary"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= ESPACIO ================= -->
-
-<section id="spacePanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>🛰 Programa Espacial</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="satelliteList"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= INTELIGENCIA ================= -->
-
-<section id="spyPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>🕵 Inteligencia</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="spyOperations"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= ESTADÍSTICAS ================= -->
-
-<section id="statisticsPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>📊 Estadísticas</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <canvas id="statisticsChart"></canvas>
-
-    </div>
-
-</section>
-
-<!-- ================= OBJETIVOS ================= -->
-
-<section id="objectivesPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>🎯 Objetivos Nacionales</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="objectivesList"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= EVENTOS ================= -->
-
-<section id="eventsPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>📰 Eventos Mundiales</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="eventsFeed"></div>
-
-    </div>
-
-</section>
-
-<!-- ================= CONFIGURACIÓN ================= -->
-
-<section id="settingsPanel" class="gameWindow hidden">
-
-    <div class="windowHeader">
-
-        <h2>⚙ Configuración</h2>
-
-        <button class="closeWindow">✖</button>
-
-    </div>
-
-    <div class="windowBody">
-
-        <div id="settingsContainer"></div>
-
-    </div>
-
-</section>
-
-<!-- ===================================================== -->
-<!-- MODAL UNIVERSAL                                      -->
-<!-- ===================================================== -->
-
-<div id="modalOverlay" class="hidden">
-
-    <div id="modalWindow">
-
-        <div id="modalHeader">
-
-            <span id="modalTitle">
-
-                Información
-
-            </span>
-
-            <button id="closeModal">
-
-                ✖
-
-            </button>
-
-        </div>
-
-        <div id="modalContent"></div>
-
-    </div>
-
-</div>
-
-<!-- ===================================================== -->
-<!-- NOTIFICACIONES                                       -->
-<!-- ===================================================== -->
-
-<div id="notificationContainer"></div>
-
-<!-- ===================================================== -->
-<!-- MENÚ CONTEXTUAL                                      -->
-<!-- ===================================================== -->
-
-<div id="contextMenu" class="hidden"></div>
-
-<!-- ===================================================== -->
-<!-- TOOLTIP GLOBAL                                       -->
-<!-- ===================================================== -->
-
-<div id="globalTooltip" class="hidden"></div>
-
-<!-- ===================================================== -->
-<!-- MENÚ DE PAUSA                                        -->
-<!-- ===================================================== -->
-
-<div id="pauseOverlay" class="hidden">
-
-    <div id="pauseMenu">
-
-        <h1>NEXUS GLOBAL</h1>
-
-        <button id="resumeGame">
-
-            ▶ Continuar
-
-        </button>
-
-        <button id="saveGameButton">
-
-            💾 Guardar
-
-        </button>
-
-        <button id="loadGameButton">
-
-            📂 Cargar
-
-        </button>
-
-        <button id="settingsGameButton">
-
-            ⚙ Configuración
-
-        </button>
-
-        <button id="exitGameButton">
-
-            🚪 Salir
-
-        </button>
-
-    </div>
-
-</div>
-
-
-
-<!-- ===================================================== -->
-<!-- CIERRE CONTENEDOR PRINCIPAL                          -->
-<!-- ===================================================== -->
-
-</div> <!-- /gameContainer -->
-
-<!-- ===================================================== -->
-<!-- LIBRERÍAS / SCRIPTS                                  -->
-<!-- Orden crítico de carga                               -->
-<!-- ===================================================== -->
-
-<script src="js/data.js"></script>
-<script src="js/simulation.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/maps.js"></script>
-<script src="js/compat.js"></script>
-<script src="js/bootstrap.js"></script>
-
-<!-- ===================================================== -->
-<!-- INICIALIZACIÓN HTML                                  -->
-<!-- ===================================================== -->
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("NEXUS GLOBAL index.html cargado");
-
-  const loading = document.getElementById("loadingScreen");
-
-  setTimeout(() => {
-    if (loading) {
-      loading.style.opacity = "0";
-      loading.style.pointerEvents = "none";
-    }
-  }, 1200);
-});
-</script>
-
+      </section>
+      <section id="mainPanel" class="main-panel"></section>
+    </main>
+
+    <aside id="contextPanel" class="context-panel"></aside>
+  </div>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <div id="modalBackdrop" class="modal-backdrop" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header><h2 id="modalTitle">Modal</h2><button id="closeModalBtn">×</button></header>
+      <div id="modalContent" class="modal-content"></div>
+    </section>
+  </div>
+
+  <script src="js/polyfills.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/economy.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
