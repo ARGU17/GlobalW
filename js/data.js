@@ -4,9 +4,9 @@ window.NEXUS_DATA = (() => {
   const countries = [
     {
       id: "ESP", name: "España", flag: "🇪🇸", color: "#ffcc3d", map: { x: 565, y: 255, size: 24 },
-      economy: { gdp: 2150, population: 49.5, treasury: 190, debtRatio: 83, growth: 2.8, inflation: 2.4, unemployment: 7.8, taxRate: 36, confidence: 76 },
-      systems: { industry: 82, technology: 79, logistics: 88, energy: 78, food: 84, military: 71, intelligence: 68, stability: 80, approval: 72, renewables: 72 },
-      budgets: { health: 6.8, education: 5.4, defense: 2.4, infrastructure: 4.2, research: 3.1, welfare: 9.4 },
+      economy: { gdp: 2850, population: 49.8, treasury: 245, debtRatio: 78, growth: 3.2, inflation: 2.2, unemployment: 6.4, taxRate: 37.5, confidence: 82 },
+      systems: { industry: 86, technology: 84, logistics: 92, energy: 85, food: 88, military: 79, intelligence: 76, stability: 85, approval: 77, renewables: 79 },
+      budgets: { health: 6.9, education: 5.6, defense: 2.7, infrastructure: 4.4, research: 3.4, welfare: 9.1 },
       strengths: ["Automoción y movilidad", "Renovables", "Turismo de alto valor", "Infraestructura ferroviaria", "Astilleros y aeroespacial"],
       risks: ["Deuda todavía elevada", "Dependencia de importaciones energéticas", "Desigualdad territorial"]
     },

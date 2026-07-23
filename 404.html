@@ -3,117 +3,127 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#07111f">
-  <title>NEXUS Global · Alpha v1.0.1</title>
-  <meta name="description" content="Alpha jugable de simulación geopolítica y económica centrada en una España reforzada.">
+  <meta name="theme-color" content="#050b12">
+  <title>NEXUS Global · Alpha v1.1</title>
+  <meta name="description" content="Simulador geopolítico, económico y estratégico. Alpha v1.1 con España reforzada.">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <div id="bootLoader" class="boot-loader">
     <div class="boot-mark">N</div>
-    <div><strong>NEXUS GLOBAL</strong><span>Inicializando Alpha v1.0.1…</span></div>
+    <div><strong>NEXUS GLOBAL</strong><span>Cargando economía, mapa y sistemas estratégicos…</span></div>
   </div>
 
   <div id="bootError" class="boot-error" hidden>
-    <h1>Error de arranque</h1>
-    <p id="bootErrorText"></p>
-    <p>Revisa que todos los archivos del ZIP se hayan subido respetando la estructura de carpetas.</p>
+    <h1>Error de arranque</h1><p id="bootErrorText"></p>
+    <button onclick="localStorage.clear();location.reload()">Borrar guardado y reintentar</button>
   </div>
 
   <div id="startOverlay" class="start-overlay">
     <div class="start-card">
-      <div class="start-brand"><span>N</span><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.0.1</small></div></div>
+      <div class="start-brand"><span>N</span><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.1 · DEEP SYSTEMS</small></div></div>
       <div class="start-copy">
-        <span class="eyebrow">Escenario principal</span>
-        <h1>España 2035: potencia industrial europea</h1>
-        <p>Economía reforzada, control territorial, producción de unidades, empresas, OPAs y diplomacia en una Alpha autónoma sin backend.</p>
+        <span class="eyebrow">Campaña principal · Enero de 2028</span>
+        <h1>España: autonomía estratégica europea</h1>
+        <p>Dirige economía, territorios, industria, energía, investigación, empresas, inteligencia, diplomacia y Fuerzas Armadas en un mundo que evoluciona por sí mismo.</p>
       </div>
       <div class="scenario-card selected">
         <div class="scenario-flag">🇪🇸</div>
-        <div><h2>España reforzada</h2><p>PIB 2,15 B€, industria 82, logística 88 y 17 regiones gestionables.</p></div>
-        <span>RECOMENDADO</span>
+        <div><h2>España reforzada</h2><p>PIB 2,15 B€, industria 82, logística 88, renovables 72 y 17 comunidades gestionables.</p></div>
+        <span>CAMPAÑA RECOMENDADA</span>
+      </div>
+      <div class="scenario-features">
+        <span>🏛 Economía profunda</span><span>🗺️ Control regional</span><span>🏭 Construcción</span><span>📈 Bolsa y OPAs</span><span>🛡️ 17 unidades visuales</span><span>🛰️ Inteligencia</span>
       </div>
       <div class="start-actions">
-        <button id="startSpainBtn" class="primary-btn large">Iniciar nueva campaña</button>
-        <button id="continueBtn" class="secondary-btn large">Continuar partida</button>
+        <button id="startSpainBtn" class="primary-btn large">Iniciar campaña</button>
+        <button id="continueBtn" class="secondary-btn large">Continuar</button>
         <button id="observerBtn" class="ghost-btn large">Modo observador</button>
       </div>
-      <p class="start-note">Sin audio. Todo el progreso se guarda localmente en el navegador.</p>
+      <p class="start-note">100% local · Sin audio · Sin API keys · Compatible con GitHub Pages</p>
     </div>
   </div>
 
-  <div class="app-shell">
+  <div class="game-shell">
     <header class="topbar">
-      <div class="brand-block"><div class="brand-mark">N</div><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.0.1</small></div></div>
-      <div class="topbar-stats">
-        <div><span>FECHA</span><b id="currentDate">—</b></div>
-        <div><span>PAÍS</span><b id="selectedCountryLabel">—</b></div>
-        <div><span>TESORERÍA</span><b id="topTreasury">—</b></div>
-        <div><span>PIB</span><b id="topGDP">—</b></div>
-        <div><span>APROBACIÓN</span><b id="topApproval">—</b></div>
+      <div class="brand-block"><div class="brand-mark">N</div><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.1</small></div></div>
+      <div class="top-kpis">
+        <div><i>🪙</i><span>Tesorería</span><b id="topTreasury">—</b></div>
+        <div><i>💶</i><span>PIB</span><b id="topGDP">—</b></div>
+        <div><i>👥</i><span>Población</span><b id="topPopulation">—</b></div>
+        <div><i>📈</i><span>Crecimiento</span><b id="topGrowth">—</b></div>
+        <div><i>🛡️</i><span>Estabilidad</span><b id="topStability">—</b></div>
+        <div><i>⚡</i><span>Energía</span><b id="topEnergy">—</b></div>
+        <div><i>🔬</i><span>Tecnología</span><b id="topTech">—</b></div>
+        <div><i>⚔️</i><span>Militar</span><b id="topMilitary">—</b></div>
+        <div><i>🤝</i><span>Influencia</span><b id="topInfluence">—</b></div>
       </div>
-      <div class="sim-controls">
-        <button id="playPauseBtn" class="primary-btn">▶ Iniciar</button>
-        <button data-speed="1" class="active">x1</button>
-        <button data-speed="2">x2</button>
-        <button data-speed="4">x4</button>
-        <button id="stepBtn" title="Avanzar un mes">+1m</button>
+      <div class="clock-block">
+        <strong id="currentDate">—</strong><span id="selectedCountryLabel">—</span>
+        <div class="sim-controls"><button id="playPauseBtn" class="primary-btn">▶</button><button data-speed="1" class="active">x1</button><button data-speed="2">x2</button><button data-speed="4">x4</button><button id="stepBtn">+1m</button></div>
       </div>
     </header>
 
-    <aside class="sidebar">
-      <nav>
-        <span class="nav-section">Gobierno</span>
-        <button data-panel="overview" class="active"><i>⌂</i><span>Resumen</span></button>
-        <button data-panel="economy"><i>€</i><span>Economía</span></button>
-        <button data-panel="regions"><i>▦</i><span>Regiones</span></button>
-        <button data-panel="industry"><i>⌁</i><span>Industria y bolsa</span></button>
-        <span class="nav-section">Estrategia</span>
-        <button data-panel="military"><i>◆</i><span>Fuerzas armadas</span></button>
-        <button data-panel="diplomacy"><i>◎</i><span>Diplomacia</span></button>
-        <button data-panel="events"><i>≋</i><span>Eventos</span></button>
-        <span class="nav-section">Sistema</span>
-        <button data-panel="settings"><i>⚙</i><span>Configuración</span></button>
-      </nav>
-      <div class="sidebar-footer">
-        <button id="saveBtn">💾 Guardar</button>
-        <button id="loadBtn">📂 Cargar</button>
-      </div>
-    </aside>
+    <nav class="main-nav">
+      <button data-panel="overview" class="active">🌍 Resumen</button>
+      <button data-panel="economy">🏛 Economía</button>
+      <button data-panel="regions">🗺️ Regiones</button>
+      <button data-panel="industry">📈 Industria y bolsa</button>
+      <button data-panel="technology">🔬 Tecnología</button>
+      <button data-panel="military">🛡️ Militar</button>
+      <button data-panel="diplomacy">🤝 Diplomacia</button>
+      <button data-panel="intelligence">🛰️ Inteligencia</button>
+      <button data-panel="objectives">🎯 Objetivos</button>
+      <button data-panel="events">📰 Eventos</button>
+      <button data-panel="settings">⚙️ Ajustes</button>
+    </nav>
 
-    <main class="main-stage">
-      <section class="map-card">
-        <div class="map-toolbar">
-          <div class="map-mode">
-            <button id="worldModeBtn" class="active">Mundo</button>
-            <button id="regionModeBtn">Regiones de España</button>
-          </div>
-          <select id="countrySelect" aria-label="Seleccionar país"></select>
-          <div class="map-legend"><span><i class="legend-dot strong"></i>Potencia alta</span><span><i class="legend-dot medium"></i>Potencia media</span><span><i class="legend-dot route"></i>Relación activa</span></div>
-        </div>
-        <div class="map-viewport">
-          <svg id="strategicMap" role="img" aria-label="Mapa estratégico interactivo"></svg>
-          <div id="mapTooltip" class="map-tooltip" hidden></div>
-        </div>
+    <main class="command-grid">
+      <aside class="left-rail">
+        <section class="hud-panel country-inspector"><header><b>PAÍS SELECCIONADO</b><button id="countryDetailsBtn">⋯</button></header><div id="countryInspector"></div></section>
+        <section class="hud-panel"><header><b>CAPACIDAD NACIONAL</b></header><div id="nationalSystems"></div></section>
+        <section class="hud-panel compact"><header><b>RECURSOS Y BALANCES</b></header><div id="resourceSummary"></div></section>
+      </aside>
+
+      <section class="center-stage">
+        <article class="map-card world-card">
+          <header class="card-header">
+            <div><span class="eyebrow">MAPA GEOPOLÍTICO MUNDIAL</span><b id="mapTitle">Poder e influencia global</b></div>
+            <div class="map-toolbar">
+              <select id="countrySelect" aria-label="Seleccionar país"></select>
+              <button data-map-layer="political" class="active">Político</button><button data-map-layer="economy">PIB</button><button data-map-layer="military">Militar</button><button data-map-layer="technology">Tecnología</button><button data-map-layer="stability">Estabilidad</button>
+            </div>
+          </header>
+          <div class="map-viewport"><svg id="strategicMap" role="img" aria-label="Mapa mundial interactivo"></svg><div id="mapTooltip" class="map-tooltip" hidden></div></div>
+        </article>
+
+        <article class="panel-card content-card">
+          <div id="mainPanel"></div>
+        </article>
       </section>
-      <section id="mainPanel" class="main-panel"></section>
+
+      <aside class="right-rail">
+        <section class="hud-panel action-panel"><header><b>CONTROL Y DECISIONES</b><span id="contextTitle">Acciones</span></header><div id="contextPanel"></div></section>
+        <section class="hud-panel event-mini"><header><b>EVENTOS ACTIVOS</b><button data-panel-jump="events">Ver todos</button></header><div id="miniEvents"></div></section>
+        <section class="hud-panel market-mini"><header><b>MERCADOS MUNDIALES</b></header><div id="marketTicker"></div></section>
+      </aside>
     </main>
 
-    <aside id="contextPanel" class="context-panel"></aside>
+    <footer class="bottom-dock">
+      <div class="dock-nav"><button data-panel="overview" class="active">🌐 Mundo</button><button data-panel="regions">🇪🇸 España</button><button data-panel="diplomacy">🤝 Diplomacia</button><button data-panel="industry">📊 Bolsa</button><button data-panel="technology">🔬 Tecnología</button></div>
+      <div class="status-line"><span id="gameStatus">Simulación pausada</span><span id="scoreStatus">Puntuación 0</span></div>
+      <div class="dock-actions"><button id="saveBtn">💾 Guardar</button><button id="loadBtn">📂 Cargar</button><button id="exportBtn">📤 Exportar</button><button id="menuSettingsBtn">⚙️ Opciones</button></div>
+    </footer>
   </div>
 
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
-
-  <div id="modalBackdrop" class="modal-backdrop" hidden>
-    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <header><h2 id="modalTitle">Modal</h2><button id="closeModalBtn">×</button></header>
-      <div id="modalContent" class="modal-content"></div>
-    </section>
-  </div>
+  <div id="modalBackdrop" class="modal-backdrop" hidden><section class="modal-card" role="dialog" aria-modal="true"><header><h2 id="modalTitle">Modal</h2><button id="closeModalBtn">×</button></header><div id="modalContent" class="modal-content"></div></section></div>
 
   <script src="js/polyfills.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/catalog.js"></script>
   <script src="js/economy.js"></script>
+  <script src="js/simulation-plus.js"></script>
   <script src="js/map.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>

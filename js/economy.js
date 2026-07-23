@@ -197,6 +197,15 @@ window.NEXUS_ECONOMY = (() => {
         pushEvent(state, "military", `${def.name} completada`, `${item.name} ha sido desplegada en ${getRegion(state, item.regionId).name}.`);
       }
       if (item.kind === "project") completeNationalProject(country, item, state);
+      if (item.kind === "building") {
+        const region = state.regions.find(r => r.id === item.regionId);
+        const def = window.NEXUS_CATALOG?.buildings?.find(b => b.id === item.buildingId);
+        if (region && def) {
+          region.buildings ||= [];
+          region.buildings.push({ id: crypto.randomUUID(), typeId: def.id, level: 1, condition: 100 });
+          pushEvent(state, "region", `${def.name} completada`, `${region.name} incorpora una nueva instalación.`);
+        }
+      }
     }
   }
 

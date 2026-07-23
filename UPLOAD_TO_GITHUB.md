@@ -1,13 +1,10 @@
-# Subida rápida a GitHub
+# Subida a GitHub Pages
 
-## Opción A — Proyecto modular
+1. Descomprime el archivo ZIP.
+2. Abre la carpeta resultante.
+3. Selecciona todos sus archivos y carpetas.
+4. Súbelos a la raíz del repositorio.
+5. Verifica que `index.html` no quede dentro de una carpeta adicional.
+6. En GitHub: `Settings → Pages → Deploy from a branch → main → / (root)`.
 
-1. Descomprime el ZIP.
-2. No subas el ZIP como archivo: GitHub no lo extrae automáticamente.
-3. Sube el contenido de la carpeta descomprimida.
-4. Verifica que `index.html` está en la raíz del repositorio.
-5. Activa GitHub Pages desde la rama principal y `/ (root)`.
-
-## Opción B — Un único archivo
-
-Usa el ZIP `SingleFile`, descomprímelo y sube solamente `index.html`. Esta versión contiene CSS, JavaScript e iconos integrados.
+GitHub no descomprime automáticamente los ZIP que se suben al repositorio.
