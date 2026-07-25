@@ -1,111 +1,114 @@
-# NEXUS Global — Alpha v1.1
+# NEXUS Global — Alpha v1.2
 
-Simulador geopolítico, económico y estratégico ejecutable directamente en navegador. Esta versión recupera la profundidad de los prototipos anteriores y la integra en una arquitectura compacta, estable y preparada para GitHub Pages.
+Simulador geopolítico, económico, político y militar ejecutable directamente en navegador y preparado para GitHub Pages.
 
-## Contenido jugable
+## Cambios principales de v1.2
 
-### Economía nacional
-- PIB, crecimiento, productividad, inflación, desempleo y confianza empresarial.
-- Tesorería, deuda pública, tipo de interés, rating soberano y balanza comercial.
-- Presupuesto detallado por sanidad, educación, defensa, infraestructuras, I+D y bienestar.
-- Ingresos fiscales, gasto ministerial, servicio de deuda y mantenimiento militar.
-- Políticas económicas temporales y proyectos nacionales.
+- **Tiempo diario:** a velocidad x1 cada día de juego dura 10 segundos reales. x2 equivale a 5 segundos y x4 a 2,5 segundos. El botón manual avanza exactamente un día.
+- **Mapa mundial geográfico:** motor Canvas con proyección Web Mercator, mosaicos OpenStreetMap cuando existe conexión y límites vectoriales locales Natural Earth como respaldo.
+- **197 países:** 193 miembros de Naciones Unidas más Palestina, Ciudad del Vaticano, Taiwán y Kosovo dentro del escenario jugable.
+- **Cambio de país:** cualquier país inspeccionado puede convertirse en el país controlado durante la campaña.
+- **Activos localizados:** industrias, energía, puertos, bases, infraestructuras y unidades aparecen sobre sus coordenadas al aumentar el zoom.
+- **Economía productiva:** instalaciones únicas por territorio, niveles de ampliación, slots, capacidad nominal, empleo, demanda energética y requisitos de infraestructura/tecnología.
+- **Fuerzas realistas:** cantidades físicas de efectivos, vehículos, aeronaves, buques, satélites y especialistas. Producción x1, x10, x100 y x1000.
+- **Guerra diaria:** frentes, composición de fuerzas, bajas, control territorial, war score, reportes de batalla y resolución del conflicto.
+- **Política:** 17 regímenes, transición institucional, elecciones, capital político y partidos.
+- **Tecnología:** 32 tecnologías distribuidas entre digital, energía, industria, defensa, espacio, biotecnología, infraestructura, agricultura y sociedad.
 
-### España reforzada
-España comienza como la **8.ª economía mundial** del escenario, con una posición industrial, tecnológica, logística y energética superior a la base anterior, pero conserva restricciones de deuda, dependencia exterior y desigualdad regional.
+## Economía
 
-### Gestión territorial
-- Las 17 comunidades autónomas españolas son seleccionables.
-- PIB, población, empleo, aprobación, estabilidad, energía, industria, infraestructura e investigación por región.
-- Construcción y mejora de 17 tipos de instalaciones.
-- Especializaciones y recursos regionales.
+El modelo ya no interpreta cada clic como una fábrica idéntica adicional. Cada territorio puede disponer de una sola instalación de cada tipo y debe ampliarla por niveles. Los proyectos consumen slots territoriales y exigen determinadas capacidades de infraestructura, energía, tecnología, estabilidad o acceso costero.
 
-### Industria y mercados
-- 22 empresas iniciales de sectores estratégicos.
-- Compra y venta de participaciones.
-- Control empresarial y OPAs sobre empresas extranjeras.
-- Precios, capitalización, tendencia y exposición sectorial.
+Cada instalación tiene:
 
-### Tecnología
-- Árbol tecnológico con requisitos, costes, tiempos y efectos.
-- Cola de investigación, puntos de I+D y tecnologías completadas.
+- capacidad nominal;
+- empleo directo;
+- producción económica;
+- consumo o generación de energía;
+- nivel máximo;
+- requisitos de implantación;
+- posición geográfica visible.
 
-### Defensa y seguridad
-- 17 tipos de unidades terrestres, aéreas, navales, espaciales, misilísticas y cibernéticas.
-- Producción, despliegue, mantenimiento, preparación, experiencia y doctrina.
-- Combustible, munición, repuestos y capacidad logística.
-- Guerra básica, alto el fuego y nivel de alerta nuclear.
+La utilización industrial depende de la confianza, logística y disponibilidad energética. La escasez reduce utilización y crecimiento, mientras que industria, logística y conocimiento mejoran gradualmente la economía.
 
-### Diplomacia e inteligencia
-- Relaciones bilaterales, comercio, ayuda, alianzas, sanciones y embargos.
-- Rutas comerciales y eficiencia logística.
-- Operaciones de inteligencia, espionaje tecnológico, sabotaje, interferencia y ciberoperaciones.
-- Informes de inteligencia sobre países objetivo.
+España mantiene una posición inicial reforzada en industria, logística, renovables, tecnología y preparación militar, pero continúa condicionada por deuda, costes presupuestarios y desequilibrios territoriales.
 
-### Mundo dinámico
-- IA económica y geopolítica para los países no controlados.
-- Mercados mundiales de recursos.
-- Tensión global, estrés energético, presión alimentaria y clima.
-- Eventos estratégicos y objetivos nacionales.
+## Política y partidos
 
-## Visualización
+Los países estratégicos incluidos en `js/politics.js` disponen de una selección de partidos reales usada como **plantilla de simulación**, no como afirmación sobre el gobierno o sondeos actuales. Para el resto de países se genera una estructura política nacional coherente para que todos los sistemas sean jugables.
 
-- Mapa mundial estratégico con capas política, PIB, tecnología, estabilidad y poder militar.
-- Vista territorial de España con comunidades autónomas interactivas.
-- Marcadores visuales de industrias, recursos y unidades.
-- Interfaz oscura de gran estrategia, adaptable a ordenador, tableta y móvil.
-- 17 iconos SVG de unidades incluidos localmente.
-- Sin audio, librerías externas, API keys ni backend.
+## Cartografía y atribución
 
-> El mapa es una representación estratégica estilizada y no una cartografía GIS de precisión. Se ha priorizado rendimiento, legibilidad y funcionamiento completamente local.
+- Los límites de países se distribuyen localmente en `assets/maps/world-countries.geojson` y proceden de Natural Earth.
+- El mapa puede superponer mosaicos estándar de OpenStreetMap. Estos requieren conexión a Internet y respetan la atribución mostrada dentro del mapa.
+- El botón `▦` permite alternar entre la base OSM y el mapa vectorial local.
+- No se implementa descarga masiva ni almacenamiento offline de mosaicos.
 
-## Publicación en GitHub Pages
-
-1. Descomprime `NEXUS_Global_Alpha_v1.1_GitHub.zip`.
-2. Sube **el contenido descomprimido**, no el ZIP.
-3. Comprueba que `index.html` esté directamente en la raíz del repositorio.
-4. Abre `Settings → Pages`.
-5. Selecciona `Deploy from a branch`, rama `main` y carpeta `/ (root)`.
-
-La raíz debe quedar así:
+## Estructura
 
 ```text
 index.html
 404.html
 .nojekyll
 css/
+  styles.css
 js/
+  polyfills.js
+  world-data.js
+  data.js
+  catalog.js
+  politics.js
+  economy.js
+  simulation-plus.js
+  deep-systems.js
+  map.js
+  ui.js
+  app.js
 assets/
+  icons/
+  maps/world-countries.geojson
 README.md
 CHANGELOG.md
+THIRD_PARTY_NOTICES.md
 LICENSE.txt
 ```
 
+## Publicación en GitHub Pages
+
+1. Descomprime `NEXUS_Global_Alpha_v1.2_GitHub.zip`.
+2. Sube **los archivos descomprimidos**, no el ZIP.
+3. Comprueba que `index.html` esté directamente en la raíz del repositorio.
+4. En GitHub abre `Settings → Pages`.
+5. Selecciona `Deploy from a branch`, rama `main` y carpeta `/ (root)`.
+
 ## Ejecución local
 
-Puede abrirse directamente, aunque para reproducir el entorno de GitHub Pages se recomienda:
-
 ```bash
-python -m http.server 8080
+python3 -m http.server 8080
 ```
 
-Después abre `http://localhost:8080`.
+Abre `http://localhost:8080`.
 
 ## Controles
 
-- `Espacio`: iniciar o pausar.
-- `+1m`: avanzar un mes.
-- `x1`, `x2`, `x4`: velocidad de simulación.
-- Barra superior y dock inferior: navegación entre sistemas.
-- Botones Guardar, Cargar y Exportar: persistencia local de campaña.
+- `Espacio`: pausar o continuar.
+- `+1 día`: avance manual.
+- `x1`: 10 segundos por día.
+- `x2`: 5 segundos por día.
+- `x4`: 2,5 segundos por día.
+- Rueda o gesto: zoom del mapa.
+- Arrastre: desplazamiento del mapa.
+- `Ctrl/Cmd + S`: guardar.
 
-## Validación de la entrega
+## Validación realizada
 
-La distribución se ha comprobado mediante:
-
-- validación sintáctica de todos los archivos JavaScript;
-- verificación de rutas CSS, JS y SVG;
-- arranque completo del navegador sin errores de ejecución;
-- apertura de todos los paneles principales;
-- avance de simulación y actualización económica anual;
-- construcción, investigación, diplomacia, inteligencia y guerra básica.
+- comprobación sintáctica de todos los JavaScript;
+- verificación de rutas internas;
+- arranque con 197 países;
+- navegación por todos los paneles;
+- avance manual y temporizado de un día;
+- cambio de país controlado;
+- producción militar por lotes y entrega de unidades;
+- transición de régimen;
+- declaración de guerra y generación de batalla diaria;
+- renderizado vectorial del mapa cuando no existe conexión a mosaicos.

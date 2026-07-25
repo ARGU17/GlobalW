@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#050b12">
-  <title>NEXUS Global · Alpha v1.1</title>
-  <meta name="description" content="Simulador geopolítico, económico y estratégico. Alpha v1.1 con España reforzada.">
+  <meta name="theme-color" content="#06111c">
+  <title>NEXUS Global · Alpha v1.2</title>
+  <meta name="description" content="Simulador geopolítico, económico y militar con mapa mundial real, 197 países y simulación diaria.">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <div id="bootLoader" class="boot-loader">
     <div class="boot-mark">N</div>
-    <div><strong>NEXUS GLOBAL</strong><span>Cargando economía, mapa y sistemas estratégicos…</span></div>
+    <div><strong>NEXUS GLOBAL</strong><span>Cargando mapa mundial, economías y sistemas estratégicos…</span></div>
   </div>
 
   <div id="bootError" class="boot-error" hidden>
@@ -21,32 +21,35 @@
 
   <div id="startOverlay" class="start-overlay">
     <div class="start-card">
-      <div class="start-brand"><span>N</span><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.1 · DEEP SYSTEMS</small></div></div>
+      <div class="start-brand"><span>N</span><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.2 · DAILY WORLD</small></div></div>
       <div class="start-copy">
-        <span class="eyebrow">Campaña principal · Enero de 2028</span>
-        <h1>España: autonomía estratégica europea</h1>
-        <p>Dirige economía, territorios, industria, energía, investigación, empresas, inteligencia, diplomacia y Fuerzas Armadas en un mundo que evoluciona por sí mismo.</p>
+        <span class="eyebrow">Campaña global · 1 de enero de 2028</span>
+        <h1>Controla cualquier Estado del mundo</h1>
+        <p>Simulación diaria, mapa real con fronteras geográficas, industrias localizadas, política, investigación, producción militar y guerras visuales.</p>
       </div>
       <div class="scenario-card selected">
-        <div class="scenario-flag">🇪🇸</div>
-        <div><h2>España reforzada</h2><p>PIB 2,15 B€, industria 82, logística 88, renovables 72 y 17 comunidades gestionables.</p></div>
-        <span>CAMPAÑA RECOMENDADA</span>
+        <div class="scenario-flag" id="startFlag">🇪🇸</div>
+        <div><h2 id="startCountryName">España reforzada</h2><p id="startCountrySummary">Economía industrial avanzada, logística europea, renovables, 17 comunidades y capacidad militar moderna.</p></div>
+        <span>PAÍS INICIAL</span>
       </div>
+      <label class="start-country-picker">País controlado al comenzar
+        <select id="startCountrySelect" aria-label="País inicial"></select>
+      </label>
       <div class="scenario-features">
-        <span>🏛 Economía profunda</span><span>🗺️ Control regional</span><span>🏭 Construcción</span><span>📈 Bolsa y OPAs</span><span>🛡️ 17 unidades visuales</span><span>🛰️ Inteligencia</span>
+        <span>🌍 197 países</span><span>🗺️ Mapa geográfico real</span><span>🏭 Capacidad industrial</span><span>🏛️ Regímenes y partidos</span><span>⚔️ Batallas diarias</span><span>🔬 30+ tecnologías</span>
       </div>
       <div class="start-actions">
-        <button id="startSpainBtn" class="primary-btn large">Iniciar campaña</button>
+        <button id="startCampaignBtn" class="primary-btn large">Iniciar campaña</button>
         <button id="continueBtn" class="secondary-btn large">Continuar</button>
         <button id="observerBtn" class="ghost-btn large">Modo observador</button>
       </div>
-      <p class="start-note">100% local · Sin audio · Sin API keys · Compatible con GitHub Pages</p>
+      <p class="start-note">GitHub Pages · Sin backend · Guardado local · Los mosaicos OSM requieren conexión a Internet</p>
     </div>
   </div>
 
   <div class="game-shell">
     <header class="topbar">
-      <div class="brand-block"><div class="brand-mark">N</div><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.1</small></div></div>
+      <div class="brand-block"><div class="brand-mark">N</div><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.2</small></div></div>
       <div class="top-kpis">
         <div><i>🪙</i><span>Tesorería</span><b id="topTreasury">—</b></div>
         <div><i>💶</i><span>PIB</span><b id="topGDP">—</b></div>
@@ -56,19 +59,20 @@
         <div><i>⚡</i><span>Energía</span><b id="topEnergy">—</b></div>
         <div><i>🔬</i><span>Tecnología</span><b id="topTech">—</b></div>
         <div><i>⚔️</i><span>Militar</span><b id="topMilitary">—</b></div>
-        <div><i>🤝</i><span>Influencia</span><b id="topInfluence">—</b></div>
+        <div><i>🏛️</i><span>Gobierno</span><b id="topGovernment">—</b></div>
       </div>
       <div class="clock-block">
         <strong id="currentDate">—</strong><span id="selectedCountryLabel">—</span>
-        <div class="sim-controls"><button id="playPauseBtn" class="primary-btn">▶</button><button data-speed="1" class="active">x1</button><button data-speed="2">x2</button><button data-speed="4">x4</button><button id="stepBtn">+1m</button></div>
+        <div class="sim-controls"><button id="playPauseBtn" class="primary-btn">▶</button><button data-speed="1" class="active">x1</button><button data-speed="2">x2</button><button data-speed="4">x4</button><button id="stepBtn">+1 día</button></div>
       </div>
     </header>
 
     <nav class="main-nav">
       <button data-panel="overview" class="active">🌍 Resumen</button>
       <button data-panel="economy">🏛 Economía</button>
-      <button data-panel="regions">🗺️ Regiones</button>
-      <button data-panel="industry">📈 Industria y bolsa</button>
+      <button data-panel="regions">🗺️ Territorios</button>
+      <button data-panel="industry">🏭 Industria</button>
+      <button data-panel="politics">🗳️ Política</button>
       <button data-panel="technology">🔬 Tecnología</button>
       <button data-panel="military">🛡️ Militar</button>
       <button data-panel="diplomacy">🤝 Diplomacia</button>
@@ -80,26 +84,29 @@
 
     <main class="command-grid">
       <aside class="left-rail">
-        <section class="hud-panel country-inspector"><header><b>PAÍS SELECCIONADO</b><button id="countryDetailsBtn">⋯</button></header><div id="countryInspector"></div></section>
-        <section class="hud-panel"><header><b>CAPACIDAD NACIONAL</b></header><div id="nationalSystems"></div></section>
+        <section class="hud-panel country-inspector"><header><b>PAÍS INSPECCIONADO</b><button id="countryDetailsBtn">⋯</button></header><div id="countryInspector"></div></section>
+        <section class="hud-panel"><header><b>CAPACIDAD DEL PAÍS CONTROLADO</b></header><div id="nationalSystems"></div></section>
         <section class="hud-panel compact"><header><b>RECURSOS Y BALANCES</b></header><div id="resourceSummary"></div></section>
       </aside>
 
       <section class="center-stage">
         <article class="map-card world-card">
           <header class="card-header">
-            <div><span class="eyebrow">MAPA GEOPOLÍTICO MUNDIAL</span><b id="mapTitle">Poder e influencia global</b></div>
+            <div><span class="eyebrow">MAPA GEOPOLÍTICO MUNDIAL</span><b id="mapTitle">Fronteras, instalaciones, unidades y guerras</b></div>
             <div class="map-toolbar">
               <select id="countrySelect" aria-label="Seleccionar país"></select>
               <button data-map-layer="political" class="active">Político</button><button data-map-layer="economy">PIB</button><button data-map-layer="military">Militar</button><button data-map-layer="technology">Tecnología</button><button data-map-layer="stability">Estabilidad</button>
             </div>
           </header>
-          <div class="map-viewport"><svg id="strategicMap" role="img" aria-label="Mapa mundial interactivo"></svg><div id="mapTooltip" class="map-tooltip" hidden></div></div>
+          <div class="map-viewport">
+            <canvas id="strategicMap" role="img" aria-label="Mapa mundial interactivo"></canvas>
+            <div class="map-controls"><button id="mapZoomIn" title="Acercar">＋</button><button id="mapZoomOut" title="Alejar">−</button><button id="mapReset" title="Vista mundial">◎</button><button id="mapBaseToggle" title="Activar o desactivar cartografía OSM">▦</button></div>
+            <div id="mapTooltip" class="map-tooltip" hidden></div>
+            <div class="map-attribution">© OpenStreetMap contributors · Límites Natural Earth (dominio público)</div>
+          </div>
         </article>
 
-        <article class="panel-card content-card">
-          <div id="mainPanel"></div>
-        </article>
+        <article class="panel-card content-card"><div id="mainPanel"></div></article>
       </section>
 
       <aside class="right-rail">
@@ -110,7 +117,7 @@
     </main>
 
     <footer class="bottom-dock">
-      <div class="dock-nav"><button data-panel="overview" class="active">🌐 Mundo</button><button data-panel="regions">🇪🇸 España</button><button data-panel="diplomacy">🤝 Diplomacia</button><button data-panel="industry">📊 Bolsa</button><button data-panel="technology">🔬 Tecnología</button></div>
+      <div class="dock-nav"><button data-panel="overview" class="active">🌐 Mundo</button><button data-panel="regions">🗺️ Territorios</button><button data-panel="politics">🏛️ Política</button><button data-panel="military">⚔️ Guerra</button><button data-panel="technology">🔬 Tecnología</button></div>
       <div class="status-line"><span id="gameStatus">Simulación pausada</span><span id="scoreStatus">Puntuación 0</span></div>
       <div class="dock-actions"><button id="saveBtn">💾 Guardar</button><button id="loadBtn">📂 Cargar</button><button id="exportBtn">📤 Exportar</button><button id="menuSettingsBtn">⚙️ Opciones</button></div>
     </footer>
@@ -120,10 +127,13 @@
   <div id="modalBackdrop" class="modal-backdrop" hidden><section class="modal-card" role="dialog" aria-modal="true"><header><h2 id="modalTitle">Modal</h2><button id="closeModalBtn">×</button></header><div id="modalContent" class="modal-content"></div></section></div>
 
   <script src="js/polyfills.js"></script>
+  <script src="js/world-data.js"></script>
   <script src="js/data.js"></script>
   <script src="js/catalog.js"></script>
+  <script src="js/politics.js"></script>
   <script src="js/economy.js"></script>
   <script src="js/simulation-plus.js"></script>
+  <script src="js/deep-systems.js"></script>
   <script src="js/map.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
