@@ -5,6 +5,7 @@ window.NEXUS_UI = (() => {
   let actions = {};
   let bound = false;
   let diplomacyQuery = "";
+  let clockTimer = null;
 
   const E = () => window.NEXUS_ECONOMY;
   const C = () => window.NEXUS_CATALOG;
@@ -23,6 +24,7 @@ window.NEXUS_UI = (() => {
     state = nextState;
     actions = nextActions || {};
     bindGlobalControls();
+    if(!clockTimer)clockTimer=setInterval(renderClock,200);
     renderAll();
   }
 
@@ -114,6 +116,7 @@ window.NEXUS_UI = (() => {
     renderContext();
     renderMiniEvents();
     renderMarketTicker();
+    renderMapRegionList();
     renderSimulationStatus();
     window.NEXUS_MAP_ENGINE?.render();
   }
@@ -126,6 +129,21 @@ window.NEXUS_UI = (() => {
     set("topGrowth", pct(c.economy.growth)); set("topStability", fmt1(c.systems.stability)); set("topEnergy", fmt1(c.systems.energy)); set("topTech", fmt1(c.systems.technology)); set("topMilitary", fmt1(c.systems.military)); set("topGovernment", c.government.regime);
     const play=document.getElementById("playPauseBtn"); if(play)play.textContent=state.running?"⏸":"▶";
     document.querySelectorAll("[data-speed]").forEach(b=>b.classList.toggle("active",Number(b.dataset.speed)===state.speed));
+    renderClock();renderTopResources();
+  }
+
+  function clockFraction(){
+    const sim=state.simulation||{};let fraction=Number(sim.clockFraction)||0;
+    if(state.running&&sim.clockAnchor)fraction+=(Date.now()-sim.clockAnchor)/(10000/Math.max(1,state.speed||1));
+    return clamp(fraction,0,.999999);
+  }
+  function renderClock(){
+    if(!state)return;const total=Math.floor(clockFraction()*86400),h=Math.floor(total/3600),m=Math.floor(total%3600/60),sec=total%60;
+    set("currentTime",`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`);
+  }
+  function renderTopResources(){
+    const box=document.getElementById("topResourceStrip");if(!box)return;const c=controlled(),balances=c.resourceBalance||{};
+    box.innerHTML=(state.resourceDefinitions||E().resourceDefinitions||[]).map(def=>{const r=balances[def.id]||{production:0,consumption:0,balance:0,unit:def.unit};return `<div class="top-resource ${r.balance>=0?"surplus":"deficit"}" title="${esc(def.name)}: producción ${fmt1(r.production)} ${esc(r.unit)}, consumo ${fmt1(r.consumption)} ${esc(r.unit)}"><span>${def.icon}</span><div><b>${esc(def.name)}</b><small>${fmt1(r.production)} / ${fmt1(r.consumption)} ${esc(r.unit)}</small></div><strong>${r.balance>=0?"+":""}${fmt1(r.balance)}</strong></div>`}).join("");
   }
 
   function renderNavigation() {
@@ -161,7 +179,7 @@ window.NEXUS_UI = (() => {
 
   function renderPanel() {
     const box=document.getElementById("mainPanel");if(!box)return;
-    const renderers={overview:renderOverview,economy:renderEconomy,regions:renderRegions,industry:renderIndustry,politics:renderPolitics,technology:renderTechnology,military:renderMilitary,diplomacy:renderDiplomacy,intelligence:renderIntelligence,objectives:renderObjectives,events:renderEvents,settings:renderSettings};
+    const renderers={overview:renderOverview,economy:renderEconomy,regions:renderRegions,industry:renderIndustry,stock:renderStock,politics:renderPolitics,technology:renderTechnology,military:renderMilitary,diplomacy:renderDiplomacy,intelligence:renderIntelligence,objectives:renderObjectives,events:renderEvents,settings:renderSettings};
     box.innerHTML=(renderers[state.activePanel]||renderOverview)();
   }
 
@@ -179,14 +197,16 @@ window.NEXUS_UI = (() => {
   }
 
   function renderEconomy() {
-    const c=controlled(),d=safeBudget(c),m=c.economicModel||{};
-    return `${heading("Economía nacional","Fiscalidad, gasto, deuda, capacidad productiva y comercio")}
-      <div class="kpi-grid">${kpi("Ingresos / mes",money(d.monthlyRevenue),"Tesoro")}${kpi("Gasto / mes",money(d.monthlySpending),"Administración")}${kpi("Balance",money(d.monthlyBalance),d.monthlyBalance>=0?"Superávit":"Déficit",d.monthlyBalance>=0?"positive":"negative")}${kpi("Productividad",fmt1(c.economy.productivity),"Índice")}${kpi("Uso industrial",pct(m.industrialUtilization),"Capacidad utilizada")}${kpi("Dependencia exterior",pct(m.tradeDependency),"Importaciones / PIB")}</div>
+    const c=controlled(),d=safeBudget(c),m=c.economicModel||{},labor=c.laborModel||{},productive=c.productiveModel||{};
+    return `${heading("Economía nacional","Fiscalidad, gasto, deuda, capacidad productiva, empleo y comercio")}
+      <div class="kpi-grid">${kpi("Ingresos / mes",money(d.monthlyRevenue),"Tesoro")}${kpi("Gasto / mes",money(d.monthlySpending),"Administración")}${kpi("Balance",money(d.monthlyBalance),d.monthlyBalance>=0?"Superávit":"Déficit",d.monthlyBalance>=0?"positive":"negative")}${kpi("Productividad",fmt1(c.economy.productivity),"Índice")}${kpi("Uso industrial",pct(m.industrialUtilization),"Capacidad utilizada")}${kpi("Dependencia exterior",pct(m.tradeDependency),"Importaciones / PIB")}${kpi("Empleo industrial",fmt0(m.facilityJobs||0),"puestos directos")}${kpi("Nuevos puestos",fmt0(labor.pendingJobs||labor.jobChange||0),"impacto mensual")}</div>
       <div class="economy-layout">
         <section class="card span-2"><div class="card-title"><h3>Presupuesto nacional</h3><span>% del PIB</span></div><div class="budget-grid">${Object.entries(c.budgets).map(([k,v])=>budgetSlider(k,v)).join("")}${taxSlider(c.economy.taxRate)}</div></section>
         <section class="card"><div class="card-title"><h3>Cuenta exterior</h3></div>${info("Exportaciones",money(c.economy.exports))}${info("Importaciones",money(c.economy.imports))}${info("Balanza",money(c.economy.tradeBalance))}${info("Reservas",money(c.economy.reserves))}${info("Tipo de interés",pct(c.economy.interestRate))}</section>
         <section class="card span-2"><div class="card-title"><h3>Modelo productivo</h3><span>La capacidad depende de instalaciones, energía, empleo y logística</span></div><div class="kpi-grid four">${kpi("Producción",fmt1(m.industrialOutput),"índice")}${kpi("Empleo directo",fmt0(m.facilityJobs),"puestos")}${kpi("Capacidad",fmt1(m.capacityScore),"puntos")}${kpi("Penalización",pct(m.shortagePenalty),"escasez")}</div><div class="sector-bars">${Object.entries(c.sectors).map(([k,v])=>meterLine(sectorName(k),v)).join("")}</div></section>
-        <section class="card"><div class="card-title"><h3>Coherencia económica</h3></div><ul class="feature-list"><li><span>●</span>Una instalación de cada tipo por territorio.</li><li><span>●</span>Las ampliaciones aumentan nivel y capacidad.</li><li><span>●</span>Infraestructura, energía y tecnología limitan proyectos.</li><li><span>●</span>La escasez energética reduce utilización y crecimiento.</li></ul></section>
+        <section class="card"><div class="card-title"><h3>Demografía y mercado laboral</h3><span>Actualización al cierre de cada mes</span></div>${info("Población",`${fmt1(c.economy.population)} M`)}${info("Desempleo",pct(c.economy.unemployment))}${info("Vacantes",fmt0(labor.jobVacancies||0))}${info("Migración neta anual",pct(labor.netMigrationAnnual||0))}${info("Crecimiento natural anual",pct(labor.naturalGrowthAnnual||0))}</section>
+        <section class="card span-2"><div class="card-title"><h3>Transformación del modelo productivo</h3><span>Las ampliaciones industriales reequilibran los sectores</span></div><div class="sector-bars">${Object.entries(productive).filter(([,v])=>Number.isFinite(Number(v))).map(([k,v])=>meterLine(sectorName(k),v)).join("")}</div></section>
+        <section class="card"><div class="card-title"><h3>Coherencia económica</h3></div><ul class="feature-list"><li><span>●</span>Una instalación de cada tipo por territorio.</li><li><span>●</span>Las ampliaciones aumentan nivel, capacidad, producción y empleo.</li><li><span>●</span>Infraestructura, energía y tecnología limitan proyectos.</li><li><span>●</span>Empleo, migración y población se recalculan mensualmente.</li></ul></section>
       </div>`;
   }
 
@@ -198,7 +218,7 @@ window.NEXUS_UI = (() => {
     const used=region.buildings.reduce((s,b)=>s+(buildingDef(b.typeId)?.slots||1),0);
     return `${heading("Comunidades autónomas","Selecciona una región; instalaciones y unidades aparecen en el mapa al acercarte",`<select data-region-select>${state.regions.map(r=>`<option value="${r.id}" ${r.id===region.id?"selected":""}>${esc(r.name)}</option>`).join("")}</select>`)}
       <div class="region-layout"><div class="region-list">${state.regions.map(r=>`<button class="region-item ${r.id===region.id?"active":""}" data-action="selectRegion" data-region-id="${r.id}"><b>${esc(r.name)}</b><small>${fmt1(r.population)} M · PIB ${money(r.gdp)}</small><small>${esc(r.specialization)}</small></button>`).join("")}</div>
-      <div class="region-detail"><div class="kpi-grid four">${kpi("PIB",money(region.gdp),region.capital)}${kpi("Infraestructura",fmt1(region.infra),"capacidad")}${kpi("Industria",fmt1(region.industry),"índice")}${kpi("Energía",fmt1(region.energy),"índice")}${kpi("Slots",`${used}/${region.capacitySlots}`,"ocupados")}${kpi("Desempleo",pct(region.unemployment),"regional")}${kpi("Estabilidad",pct(region.stability),"social")}${kpi("Defensa",fmt1(region.defense),"territorial")}</div>
+      <div class="region-detail"><div class="kpi-grid four">${kpi("PIB",money(region.gdp),region.capital)}${kpi("Infraestructura",fmt1(region.infra),"capacidad")}${kpi("Industria",fmt1(region.industry),"índice")}${kpi("Energía",fmt1(region.energy),"índice")}${kpi("Slots",`${used}/${region.capacitySlots}`,"ocupados")}${kpi("Desempleo",pct(region.unemployment),"regional")}${kpi("Estabilidad",pct(region.stability),"social")}${kpi("Defensa",fmt1(region.defense),"territorial")}${kpi("Empleo industrial",fmt0(region.directJobs||0),"puestos directos")}${kpi("Variación empleo",`${(region.employmentImpact||0)>=0?"+":""}${fmt0(region.employmentImpact||0)}`,"último cierre")}</div>
       <section class="card"><div class="card-title"><h3>Instalaciones de ${esc(region.name)}</h3><span>Marcadores visibles en el mapa</span></div><div class="building-grid">${region.buildings.length?region.buildings.map(facilityCard).join(""):`<p class="muted">No hay instalaciones.</p>`}</div></section>
       <section class="card"><div class="card-title"><h3>Nueva capacidad</h3><span>No se permiten duplicados absurdos; amplía niveles</span></div><div class="building-grid">${C().buildings.map(buildCard).join("")}</div></section></div></div>`;
   }
@@ -216,7 +236,17 @@ window.NEXUS_UI = (() => {
     return `${heading("Industria, energía e infraestructuras","Capacidad física, empresas y proyectos en cola")}
       <div class="kpi-grid four">${kpi("Instalaciones",fmt0(facilities.length),"activas")}${kpi("Empleo directo",fmt0(c.economicModel.facilityJobs),"personas")}${kpi("Producción",fmt1(c.economicModel.industrialOutput),"índice")}${kpi("Utilización",pct(c.economicModel.industrialUtilization),"capacidad")}</div>
       <section class="card"><div class="card-title"><h3>Mapa de activos productivos</h3><span>Haz zoom para ver cada instalación</span></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Activo</th><th>Localización</th><th>Nivel</th><th>Capacidad</th><th>Empleo</th><th>Energía</th></tr></thead><tbody>${facilities.map(f=>{const d=buildingDef(f.typeId)||{};return `<tr><td>${d.icon||"🏢"} ${esc(d.name||f.typeId)}</td><td>${esc(f.place)}</td><td>${f.level||1}/${d.maxLevel||4}</td><td>${esc(d.capacity||"—")}</td><td>${fmt0((d.jobs||0)*(f.level||1))}</td><td>${(d.energy||0)*(f.level||1)>0?"+":""}${fmt1((d.energy||0)*(f.level||1))}</td></tr>`}).join("")}</tbody></table></div></section>
-      <section class="card"><div class="card-title"><h3>Empresas estratégicas</h3><span>Mercado de capitales</span></div><div class="company-grid">${state.companies.map(companyCard).join("")}</div></section>`;
+      <section class="card"><div class="card-title"><h3>Empresas estratégicas nacionales</h3><span>Mercado de capitales global</span></div><div class="company-grid">${state.companies.filter(x=>x.countryId===c.id).slice(0,8).map(companyCard).join("")||`<p class="muted">No hay empresas cotizadas nacionales en el escenario.</p>`}</div><button class="primary-btn" data-panel-jump="stock">Abrir Bolsa global</button></section>`;
+  }
+
+  function renderStock(){
+    const c=controlled(),indices=state.market?.indices||{},companies=[...state.companies].sort((a,b)=>(b.marketCap||0)-(a.marketCap||0));
+    const portfolio=companies.reduce((sum,x)=>sum+(x.marketCap||0)*(E().getHolding?.(state,x.id,c.id)||0)/100,0);
+    const controlledCompanies=companies.filter(x=>(E().getHolding?.(state,x.id,c.id)||0)>=51).length;
+    return `${heading("Bolsa y participaciones estratégicas","Empresas reales como referencia; precios y estados financieros completamente simulados",`<span class="simulation-badge">DATOS FICTICIOS · NO EN VIVO</span>`)}
+      <div class="kpi-grid four">${kpi("Cartera pública",money(portfolio),"valor simulado")}${kpi("Empresas controladas",fmt0(controlledCompanies),"participación ≥51%")}${kpi("Sentimiento",fmt1(state.market?.sentiment||50),"0–100")}${kpi("Cotizadas",fmt0(companies.length),"mercado global")}</div>
+      <section class="card"><div class="card-title"><h3>Índices simulados</h3><span>Actualización diaria</span></div><div class="market-index-grid">${Object.entries(indices).map(([name,x])=>`<article class="market-index"><span>${esc(name)}</span><b>${fmt1(x.value)}</b><strong class="${x.change>=0?"positive":"negative"}">${x.change>=0?"+":""}${fmt1(x.change)}%</strong>${sparkline(state.market?.history?.[name]||[x.value],x.change>=0?"#54dda1":"#ff6d7a")}</article>`).join("")}</div></section>
+      <section class="card"><div class="card-title"><h3>Mercado global</h3><span>Compra, vende o lanza una OPA con la tesorería del país controlado</span></div><div class="company-grid stock-grid">${companies.map(companyCard).join("")}</div></section>`;
   }
 
   function renderPolitics() {
@@ -246,12 +276,14 @@ window.NEXUS_UI = (() => {
 
   function renderDiplomacy() {
     const c=controlled(),sel=selected();
+    const routes=(state.tradeRoutes||[]).filter(r=>r.active!==false&&r.countries?.includes(c.id));
     let others=state.countries.filter(x=>x.id!==c.id);
     if(diplomacyQuery)others=others.filter(x=>`${x.name} ${x.id}`.toLowerCase().includes(diplomacyQuery));
     others.sort((a,b)=>(c.relations[b.id]??50)-(c.relations[a.id]??50));
     const featured=others.slice(0,36);
     return `${heading("Diplomacia mundial","197 entidades soberanas, relaciones, comercio, sanciones y guerra",`<input id="diplomacySearch" value="${esc(diplomacyQuery)}" placeholder="Buscar país…">`)}
       <section class="card selected-diplomacy"><div class="country-hero"><div class="country-flag">${sel.flag}</div><div><h2>${esc(sel.name)}</h2><p>${esc(sel.government.regime)} · Relación ${sel.id===c.id?"—":fmt1(c.relations[sel.id]??50)}</p></div></div>${sel.id!==c.id?diplomacyActions(sel,c):`<p class="muted">Este es el país controlado.</p>`}</section>
+      <section class="card"><div class="card-title"><h3>🚢 Corredores comerciales marítimos</h3><span>${routes.reduce((sum,r)=>sum+(r.ships?.length||0),0)} buques operativos</span></div><div class="trade-route-grid">${routes.length?routes.map(r=>tradeRouteCard(r,c)).join(""):`<p class="muted">Firma un acuerdo comercial para activar una ruta y asignar buques de suministro.</p>`}</div></section>
       <div class="diplomacy-grid">${featured.map(x=>diplomacyCard(x,c)).join("")}</div>${others.length>featured.length?`<p class="muted center">Mostrando ${featured.length} de ${others.length}. Usa la búsqueda para localizar cualquier país.</p>`:""}`;
   }
 
@@ -291,19 +323,26 @@ window.NEXUS_UI = (() => {
   }
 
   function renderMiniEvents(){const box=document.getElementById("miniEvents");if(!box)return;box.innerHTML=state.events.slice(0,7).map(e=>`<div class="mini-event"><span>${eventIcon(e.type)}</span><p>${esc(e.title)}</p><time>${e.date.slice(5)}</time></div>`).join("")}
-  function renderMarketTicker(){const box=document.getElementById("marketTicker");if(!box)return;box.innerHTML=state.resources.slice(0,6).map(r=>`<div class="market-line"><span>${r.icon}</span><b>${esc(r.name)}</b><strong class="${r.trend>=0?"positive":"negative"}">${fmt1(r.price)} ${r.trend>=0?"▲":"▼"}</strong></div>`).join("")}
+  function renderMarketTicker(){const box=document.getElementById("marketTicker");if(!box)return;const indices=Object.entries(state.market?.indices||{}).slice(0,5);box.innerHTML=indices.map(([name,x])=>`<div class="market-line"><span>📊</span><b>${esc(name)}</b><strong class="${x.change>=0?"positive":"negative"}">${fmt1(x.value)} ${x.change>=0?"▲":"▼"}</strong></div>`).join("")+`<button class="full" data-panel-jump="stock">Abrir Bolsa</button>`}
+  function renderMapRegionList(){
+    const box=document.getElementById("mapRegionList");if(!box)return;const show=state.selectedCountryId==="ESP"||state.controlledCountryId==="ESP";
+    box.hidden=!show;if(!show)return;box.innerHTML=`<header><b>Comunidades autónomas</b><small>Clic para centrar</small></header><div>${state.regions.map(r=>`<button data-action="selectRegion" data-region-id="${r.id}" class="${r.id===state.selectedRegionId?"active":""}"><span>${esc(r.name)}</span><small>${fmt1(r.population)} M · ${fmt0(r.directJobs||0)} empleos directos</small></button>`).join("")}</div>`;
+  }
+
   function renderSimulationStatus(){set("gameStatus",state.running?`Activa · x${state.speed} · 1 día/${fmt1(10/state.speed)} s`:"Simulación pausada");set("scoreStatus",`Puntuación ${state.score}`)}
 
   function facilitySummary(c){const list=c.id==="ESP"?state.regions.flatMap(r=>r.buildings.map(b=>({...b,place:r.name}))):c.facilities.map(b=>({...b,place:c.name}));if(!list.length)return `<p class="muted">Sin instalaciones.</p>`;return `<div class="facility-strip">${list.slice(0,16).map(f=>{const d=buildingDef(f.typeId)||{};return `<div title="${esc(f.place)}"><span>${d.icon||"🏢"}</span><b>${esc(d.name||f.typeId)}</b><small>N${f.level||1} · ${esc(f.place)}</small></div>`}).join("")}</div>`}
   function facilityCard(f){const d=buildingDef(f.typeId)||{};return `<article class="building-card"><header><h3>${d.icon||"🏢"} ${esc(d.name||f.typeId)}</h3><b>N${f.level||1}</b></header><p>${esc(d.capacity||d.description||"")} · ${fmt0((d.jobs||0)*(f.level||1))} empleos</p><footer><button data-action="upgradeBuilding" data-building-id="${f.id}" ${(f.level||1)>=(d.maxLevel||4)?"disabled":""}>Ampliar nivel</button></footer></article>`}
   function buildCard(d){const c=controlled(),target=c.id==="ESP"?state.regions.find(r=>r.id===state.selectedRegionId)?.buildings:c.facilities,exists=target?.some(b=>b.typeId===d.id)||c.productionQueue.some(q=>q.kind==="facilityV2"&&q.buildingId===d.id&&(c.id!=="ESP"||q.regionId===state.selectedRegionId));return `<article class="building-card ${exists?"locked":""}"><header><h3>${d.icon} ${esc(d.name)}</h3><b>${money(d.cost)}</b></header><p>${esc(d.capacity||d.description)} · ${d.slots||1} slots · ${fmt0(d.jobs||0)} empleos</p><small>${requirementText(d)}</small><footer><button data-action="build" data-building-id="${d.id}" ${exists?"disabled":""}>${exists?"Existente: ampliar":"Construir"}</button></footer></article>`}
   function requirementText(d){const r=d.requires||{},a=[];if(r.infra)a.push(`Infra ${r.infra}`);if(r.energy)a.push(`Energía ${r.energy}`);if(r.technology)a.push(`Tech ${r.technology}`);if(r.coastal)a.push("Costa");return a.length?`Requisitos: ${a.join(" · ")}`:"Sin requisitos especiales"}
-  function companyCard(c){const owner=E().getCountry(state,c.countryId);const held=c.ownership?.player||0;return `<article class="company-card ${held>=51?"controlled":""}"><header><div><h3>${owner.flag} ${esc(c.name)}</h3><p>${esc(c.sector)}</p></div><b>${money(c.marketCap)}</b></header>${sparkline(c.history,"#47b8ff")}<div class="kpi-grid three">${kpi("Precio",fmt1(c.price),"€/acc.")}${kpi("Participación",pct(held),held>=51?"CONTROL":"Cartera")}${kpi("Empleo",fmt0(c.employees),"personas")}</div><footer><button data-action="buyShares" data-company-id="${c.id}" data-pct="5">Comprar 5%</button><button data-action="sellShares" data-company-id="${c.id}" data-pct="5">Vender 5%</button><button data-action="takeover" data-company-id="${c.id}">OPA</button></footer></article>`}
+  function companyCard(c){const owner=E().getCountry(state,c.countryId),held=E().getHolding?.(state,c.id,controlled().id)||0,f=c.financials||{};return `<article class="company-card ${held>=51?"controlled":""}"><header><div><h3>${owner?.flag||"🏳️"} ${esc(c.name)}</h3><p>${esc(c.sector)} · ${esc(owner?.name||c.countryId)}</p></div><b>${money(c.marketCap)}</b></header>${sparkline(c.history,c.dayChange>=0?"#54dda1":"#ff6d7a")}<div class="stock-price-line"><strong>${fmt1(c.price)} €</strong><span class="${c.dayChange>=0?"positive":"negative"}">${c.dayChange>=0?"+":""}${fmt1(c.dayChange)}%</span></div><div class="company-facts"><span>Ingresos <b>${money(f.revenue||0)}</b></span><span>Beneficio <b>${money(f.profit||0)}</b></span><span>PER <b>${fmt1(f.pe||0)}</b></span><span>Dividendo <b>${pct(f.dividend||0)}</b></span></div><div class="kpi-grid three">${kpi("Participación",pct(held),held>=51?"CONTROL":"Cartera")}${kpi("Empleo",fmt0(c.employees),"personas")}${kpi("Margen",pct(f.margin||0),"operativo")}</div><footer><button data-action="buyShares" data-company-id="${c.id}" data-pct="1">Comprar 1%</button><button data-action="buyShares" data-company-id="${c.id}" data-pct="5">Comprar 5%</button><button data-action="sellShares" data-company-id="${c.id}" data-pct="5">Vender 5%</button><button data-action="takeover" data-company-id="${c.id}">OPA</button></footer></article>`}
   function partyCard(party,c){const ruling=party.id===c.politics.rulingPartyId;return `<article class="party-card ${ruling?"ruling":""}"><i style="background:${party.color}"></i><div><h3>${esc(party.name)}</h3><p>${esc(party.ideology)}</p></div><b>${pct(party.popularity)}</b><button data-action="appointParty" data-party-id="${party.id}" ${ruling?"disabled":""}>${ruling?"Gobierno":"Nombrar"}</button></article>`}
   function regimeCard(r,c){const active=c.politics.regimeId===r.id;return `<article class="regime-card ${active?"active":""}"><header><h3>${esc(r.name)}</h3><b>${r.pluralism}</b></header><p>${esc(r.description)}</p><div class="regime-metrics"><span>Pluralismo ${r.pluralism}</span><span>Mercado ${r.economicFreedom}</span><span>Control ${r.stateControl}</span></div><button data-action="changeRegime" data-regime-id="${r.id}" ${active?"disabled":""}>${active?"Régimen vigente":"Iniciar transición"}</button></article>`}
   function techCard(t,c){const done=c.completedTechs.includes(t.id),active=c.techQueue.find(q=>q.techId===t.id),locked=(t.requires||[]).some(x=>!c.completedTechs.includes(x));return `<article class="tech-card ${locked?"locked":""}"><header><h3>${t.icon} ${esc(t.name)}</h3><b>${done?"✓":t.cost}</b></header><p>${esc(t.description)}</p><div class="info-row"><span>Duración</span><b>${t.months} meses</b></div>${active?progress(active.totalMonths||t.months,active.monthsRemaining):done?`<b class="positive">COMPLETADA</b>`:`<button data-action="research" data-tech-id="${t.id}" ${locked?"disabled":""}>Investigar</button>`}</article>`}
   function unitCard(u,batch){const cost=(u.unitCost||u.cost||0)*batch;return `<article class="unit-card"><div class="unit-visual"><span>${esc(u.category)}</span><img src="${u.icon}" alt="${esc(u.name)}"></div><div class="unit-info"><h3>${esc(u.name)}</h3><p class="muted">${esc(u.description||"")}</p><div class="unit-stats"><span>Ataque <b>${u.stats.attack}</b></span><span>Defensa <b>${u.stats.defense}</b></span><span>Cantidad <b>${fmt0(batch)}</b></span><span>Coste <b>${money(cost)}</b></span><span>Plazo base <b>${fmt0(u.productionDays||60)} d</b></span><span>Tipo <b>${esc(u.unitName||"unidades")}</b></span></div><button data-action="queueUnit" data-unit-id="${u.id}" data-quantity="${batch}">Producir x${fmt0(batch)}</button></div></article>`}
   function deployedUnit(u){const d=unitDef(u.typeId),r=state.regions.find(x=>x.id===u.regionId);return `<article class="deployed-unit"><img src="${d?.icon||""}" alt=""><div><h4>${esc(d?.name||u.name)}</h4><p>${fmt0(u.quantity)} ${esc(d?.unitName||"unidades")} · ${r?.name||controlled().name}</p><span>${pct(u.readiness)} · EXP ${fmt0(u.experience)}</span>${controlled().id==="ESP"?`<select id="deploy-${u.id}">${state.regions.map(x=>`<option value="${x.id}" ${x.id===u.regionId?"selected":""}>${esc(x.name)}</option>`).join("")}</select><button data-action="deployUnit" data-unit-id="${u.id}">Desplegar</button>`:""}</div></article>`}
+  function tradeRouteCard(route,c){const otherId=route.countries.find(id=>id!==c.id),other=E().getCountry(state,otherId),ships=route.ships||[],lead=ships[0],cargo=lead?.cargo||{};return `<article class="trade-route-card"><header><div><b>${c.flag} ${esc(c.name)} ⇄ ${other?.flag||"🏳️"} ${esc(other?.name||otherId)}</b><small>Volumen ${fmt1(route.volume||0)} · Eficiencia ${fmt1(route.efficiency||0)}%</small></div><strong>${ships.length} 🚢</strong></header><div class="trade-cargo"><span>${cargo.icon||"📦"}</span><div><b>${esc(cargo.name||"Carga mixta")}</b><small>${fmt1(cargo.quantity||0)} ${esc(cargo.unit||"")} · ${lead?.status||"En ruta"}</small></div></div><div class="meter"><i style="width:${clamp((lead?.progress||0)*100,0,100)}%"></i></div></article>`}
+
   function diplomacyActions(target,c){const conflict=warBetween(c.id,target.id);return `<div class="diplomacy-buttons"><button data-action="diplomacy" data-country-id="${target.id}" data-kind="trade">Comercio</button><button data-action="diplomacy" data-country-id="${target.id}" data-kind="aid">Ayuda</button><button data-action="diplomacy" data-country-id="${target.id}" data-kind="alliance">Alianza</button><button data-action="diplomacy" data-country-id="${target.id}" data-kind="embargo">Embargo</button><button class="danger-btn" data-action="war" data-country-id="${target.id}" data-kind="${conflict?"ceasefire":"declare"}">${conflict?"Alto el fuego":"Declarar guerra"}</button></div>`}
   function diplomacyCard(target,c){const rel=c.relations[target.id]??50;return `<article class="diplomacy-card"><header><div class="flag-large">${target.flag}</div><div><h3>${esc(target.name)}</h3><p>${esc(target.government.regime)}</p></div><b class="${rel>=70?"positive":rel<38?"negative":"warning"}">${fmt1(rel)}</b></header><div class="meter"><i style="width:${clamp(rel,0,100)}%"></i></div><footer><button onclick="NEXUS_ACTIONS.selectCountry('${target.id}')">Inspeccionar</button><button data-action="diplomacy" data-country-id="${target.id}" data-kind="trade">Comercio</button><button data-action="war" data-country-id="${target.id}" data-kind="${warBetween(c.id,target.id)?"ceasefire":"declare"}">${warBetween(c.id,target.id)?"Paz":"Guerra"}</button></footer></article>`}
   function operationCard(op,target){return `<article class="building-card"><header><h3>${op.icon} ${esc(op.name)}</h3><b>${money(op.cost)}</b></header><p>${esc(op.description)}</p><footer><button data-action="operation" data-country-id="${target.id}" data-operation-id="${op.id}">Ejecutar</button></footer></article>`}
@@ -337,7 +376,7 @@ window.NEXUS_UI = (() => {
   function set(id,value){const el=document.getElementById(id);if(el)el.textContent=value}
   function clamp(v,a,b){return Math.max(a,Math.min(b,Number(v)||0))}
   function partyName(c){return c.politics?.parties?.find(p=>p.id===c.politics.rulingPartyId)?.name||c.government.ideology}
-  function eventIcon(t){return({system:"⚙️",economy:"💶",energy:"⚡",social:"👥",diplomacy:"🤝",intel:"🛰️",military:"🛡️",battle:"⚔️",politics:"🗳️",project:"🏗️",region:"🗺️",market:"📈",technology:"🔬",policy:"🏛️",objective:"🎯",climate:"🌡️",defense:"⚔️",industry:"🏭"})[t]||"📰"}
+  function eventIcon(t){return({system:"⚙️",economy:"💶",energy:"⚡",social:"👥",diplomacy:"🤝",intel:"🛰️",military:"🛡️",battle:"⚔️",politics:"🗳️",project:"🏗️",region:"🗺️",market:"📈",technology:"🔬",policy:"🏛️",objective:"🎯",climate:"🌡️",defense:"⚔️",industry:"🏭",shipping:"🚢",trade:"🚢"})[t]||"📰"}
   function budgetName(k){return({health:"Sanidad",education:"Educación",defense:"Defensa",infrastructure:"Infraestructura",research:"I+D",welfare:"Protección social"})[k]||k}
   function sectorName(k){return({services:"Servicios",industry:"Industria",public:"Sector público",agriculture:"Agricultura",construction:"Construcción",tourism:"Turismo",automotive:"Automoción",energy:"Energía",digital:"Digital",defense:"Defensa"})[k]||k}
 

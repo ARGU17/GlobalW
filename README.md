@@ -1,48 +1,78 @@
-# NEXUS Global — Alpha v1.2
+# NEXUS Global — Alpha v1.3
 
-Simulador geopolítico, económico, político y militar ejecutable directamente en navegador y preparado para GitHub Pages.
+Simulador geopolítico, económico, político, industrial y militar ejecutable directamente en navegador y preparado para GitHub Pages.
 
-## Cambios principales de v1.2
+## Novedades principales de v1.3
 
-- **Tiempo diario:** a velocidad x1 cada día de juego dura 10 segundos reales. x2 equivale a 5 segundos y x4 a 2,5 segundos. El botón manual avanza exactamente un día.
-- **Mapa mundial geográfico:** motor Canvas con proyección Web Mercator, mosaicos OpenStreetMap cuando existe conexión y límites vectoriales locales Natural Earth como respaldo.
-- **197 países:** 193 miembros de Naciones Unidas más Palestina, Ciudad del Vaticano, Taiwán y Kosovo dentro del escenario jugable.
-- **Cambio de país:** cualquier país inspeccionado puede convertirse en el país controlado durante la campaña.
-- **Activos localizados:** industrias, energía, puertos, bases, infraestructuras y unidades aparecen sobre sus coordenadas al aumentar el zoom.
-- **Economía productiva:** instalaciones únicas por territorio, niveles de ampliación, slots, capacidad nominal, empleo, demanda energética y requisitos de infraestructura/tecnología.
-- **Fuerzas realistas:** cantidades físicas de efectivos, vehículos, aeronaves, buques, satélites y especialistas. Producción x1, x10, x100 y x1000.
-- **Guerra diaria:** frentes, composición de fuerzas, bajas, control territorial, war score, reportes de batalla y resolución del conflicto.
-- **Política:** 17 regímenes, transición institucional, elecciones, capital político y partidos.
-- **Tecnología:** 32 tecnologías distribuidas entre digital, energía, industria, defensa, espacio, biotecnología, infraestructura, agricultura y sociedad.
+### Bolsa global recuperada y ampliada
 
-## Economía
+- Panel **Bolsa** integrado en la navegación principal y en la barra inferior.
+- 74 empresas cotizadas dentro del escenario, incluyendo compañías españolas e internacionales con nombres reales.
+- Índices simulados, cotización diaria, capitalización, ingresos, beneficio, margen, PER, dividendo y beta.
+- Compra y venta de participaciones con cargo a la tesorería del país controlado.
+- OPA para alcanzar el control estratégico de una empresa.
+- Cartera independiente para cada país controlable.
 
-El modelo ya no interpreta cada clic como una fábrica idéntica adicional. Cada territorio puede disponer de una sola instalación de cada tipo y debe ampliarla por niveles. Los proyectos consumen slots territoriales y exigen determinadas capacidades de infraestructura, energía, tecnología, estabilidad o acceso costero.
+Los nombres corporativos se usan únicamente como referencia visual. Todos los precios, estados financieros y movimientos son ficticios y no constituyen datos de mercado.
 
-Cada instalación tiene:
+### Comercio marítimo visible
 
-- capacidad nominal;
-- empleo directo;
-- producción económica;
-- consumo o generación de energía;
-- nivel máximo;
-- requisitos de implantación;
-- posición geográfica visible.
+- Cada acuerdo comercial crea o activa un corredor marítimo.
+- Los corredores disponen de uno o varios buques según su volumen.
+- Los barcos se desplazan visualmente en el mapa entre los puertos de ambos países.
+- Cada viaje lleva el recurso que mejor compensa el excedente del exportador y el déficit del importador.
+- Las entregas modifican inventarios, importaciones, exportaciones y tesorería.
+- El panel de Diplomacia lista rutas, cargas, buques y progreso.
 
-La utilización industrial depende de la confianza, logística y disponibilidad energética. La escasez reduce utilización y crecimiento, mientras que industria, logística y conocimiento mejoran gradualmente la economía.
+### Producción y consumo de recursos
 
-España mantiene una posición inicial reforzada en industria, logística, renovables, tecnología y preparación militar, pero continúa condicionada por deuda, costes presupuestarios y desequilibrios territoriales.
+La barra superior muestra en tiempo real la producción, el consumo y el balance de:
 
-## Política y partidos
+- electricidad;
+- alimentos;
+- combustibles;
+- acero;
+- vehículos;
+- electrónica;
+- maquinaria;
+- medicamentos.
 
-Los países estratégicos incluidos en `js/politics.js` disponen de una selección de partidos reales usada como **plantilla de simulación**, no como afirmación sobre el gobierno o sondeos actuales. Para el resto de países se genera una estructura política nacional coherente para que todos los sistemas sean jugables.
+Los balances dependen de población, capacidad industrial, energía, tecnología e instalaciones construidas. Los déficits pueden cubrirse mediante rutas comerciales.
 
-## Cartografía y atribución
+### Reloj horario
 
-- Los límites de países se distribuyen localmente en `assets/maps/world-countries.geojson` y proceden de Natural Earth.
-- El mapa puede superponer mosaicos estándar de OpenStreetMap. Estos requieren conexión a Internet y respetan la atribución mostrada dentro del mapa.
-- El botón `▦` permite alternar entre la base OSM y el mapa vectorial local.
-- No se implementa descarga masiva ni almacenamiento offline de mosaicos.
+- Se mantiene la velocidad de **1 día cada 10 segundos reales** a x1.
+- El reloj muestra el avance horario dentro del día en formato `HH:MM:SS`.
+- x2 y x4 aceleran tanto el reloj como el cambio de día de forma sincronizada.
+- Pausar conserva la hora exacta alcanzada.
+
+### Comunidades autónomas en el mapa
+
+- Las 17 comunidades autónomas españolas se dibujan como polígonos seleccionables al acercar el mapa.
+- Se muestran etiquetas, capital, población, PIB, industria y desempleo.
+- Una lista lateral permite seleccionar directamente cada comunidad.
+- El juego intenta cargar geometría administrativa detallada de `es-atlas`; si no hay conexión usa un respaldo local incluido.
+
+### Empleo, población y modelo productivo
+
+- Ampliar una instalación aumenta inmediatamente capacidad, producción y empleo directo.
+- El cierre mensual aplica los nuevos puestos al desempleo, vacantes, migración y población.
+- La población evoluciona por crecimiento natural y migración neta.
+- El PIB y la productividad reaccionan a empleo, capacidad, tecnología y demografía.
+- El modelo productivo cambia gradualmente según las instalaciones dominantes: automoción, industria pesada, energía, digital, defensa y construcción.
+- Las comunidades reciben su parte del crecimiento de empleo y población.
+
+## Sistemas conservados de v1.2
+
+- 197 países jugables y cambio de país durante la campaña.
+- Simulación diaria y botón de avance manual.
+- Mapa Canvas/Web Mercator, OpenStreetMap opcional y límites locales Natural Earth.
+- Instalaciones y unidades localizadas sobre el mapa.
+- Producción militar x1, x10, x100 y x1000.
+- Guerra diaria con frentes, composición de fuerzas, bajas, control territorial y reportes de batalla.
+- 17 regímenes políticos, elecciones, transiciones y partidos.
+- Más de 30 tecnologías.
+- Guardado local, importación y exportación JSON.
 
 ## Estructura
 
@@ -61,23 +91,27 @@ js/
   economy.js
   simulation-plus.js
   deep-systems.js
+  alpha-v13.js
   map.js
   ui.js
   app.js
 assets/
   icons/
-  maps/world-countries.geojson
+  maps/
+    world-countries.geojson
+    spain-autonomous-regions.topojson
 README.md
 CHANGELOG.md
 THIRD_PARTY_NOTICES.md
+UPLOAD_TO_GITHUB.md
 LICENSE.txt
 ```
 
 ## Publicación en GitHub Pages
 
-1. Descomprime `NEXUS_Global_Alpha_v1.2_GitHub.zip`.
-2. Sube **los archivos descomprimidos**, no el ZIP.
-3. Comprueba que `index.html` esté directamente en la raíz del repositorio.
+1. Descomprime `NEXUS_Global_Alpha_v1.3_GitHub.zip`.
+2. Sube **el contenido descomprimido**, no el ZIP.
+3. Verifica que `index.html` esté directamente en la raíz del repositorio.
 4. En GitHub abre `Settings → Pages`.
 5. Selecciona `Deploy from a branch`, rama `main` y carpeta `/ (root)`.
 
@@ -100,15 +134,6 @@ Abre `http://localhost:8080`.
 - Arrastre: desplazamiento del mapa.
 - `Ctrl/Cmd + S`: guardar.
 
-## Validación realizada
+## Compatibilidad de guardados
 
-- comprobación sintáctica de todos los JavaScript;
-- verificación de rutas internas;
-- arranque con 197 países;
-- navegación por todos los paneles;
-- avance manual y temporizado de un día;
-- cambio de país controlado;
-- producción militar por lotes y entrega de unidades;
-- transición de régimen;
-- declaración de guerra y generación de batalla diaria;
-- renderizado vectorial del mapa cuando no existe conexión a mosaicos.
+La versión v1.3 intenta migrar partidas de v1.2, v1.1 y v1.0. Las antiguas rutas comerciales se convierten automáticamente al nuevo formato con buques y cargas.

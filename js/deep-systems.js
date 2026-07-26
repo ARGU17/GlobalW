@@ -257,7 +257,7 @@
     const state=hydrateV2(oldCreate());
     state.date="2028-01-01";state.running=false;state.speed=1;state.controlledCountryId="ESP";state.selectedCountryId="ESP";
     state.events=(state.events||[]).filter(e=>!String(e.title||"").toLowerCase().includes("nexus"));
-    E.pushEvent(state,"system","NEXUS Global Alpha v1.2","Simulación diaria, mapa mundial real, política, economía productiva y guerra táctica activadas.");
+    E.pushEvent(state,"system","NEXUS Global Alpha v1.3","Bolsa global, rutas marítimas, balances productivos, reloj horario, regiones y economía demográfica activadas.");
     recalculateAllEconomies(state);
     return state;
   }

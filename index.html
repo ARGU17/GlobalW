@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#06111c">
-  <title>NEXUS Global · Alpha v1.2</title>
+  <title>NEXUS Global · Alpha v1.3</title>
   <meta name="description" content="Simulador geopolítico, económico y militar con mapa mundial real, 197 países y simulación diaria.">
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -21,7 +21,7 @@
 
   <div id="startOverlay" class="start-overlay">
     <div class="start-card">
-      <div class="start-brand"><span>N</span><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.2 · DAILY WORLD</small></div></div>
+      <div class="start-brand"><span>N</span><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.3 · DAILY WORLD</small></div></div>
       <div class="start-copy">
         <span class="eyebrow">Campaña global · 1 de enero de 2028</span>
         <h1>Controla cualquier Estado del mundo</h1>
@@ -36,7 +36,7 @@
         <select id="startCountrySelect" aria-label="País inicial"></select>
       </label>
       <div class="scenario-features">
-        <span>🌍 197 países</span><span>🗺️ Mapa geográfico real</span><span>🏭 Capacidad industrial</span><span>🏛️ Regímenes y partidos</span><span>⚔️ Batallas diarias</span><span>🔬 30+ tecnologías</span>
+        <span>🌍 197 países</span><span>🗺️ Mundo + comunidades</span><span>🏭 Empleo y producción</span><span>📈 Bolsa global</span><span>🚢 Comercio marítimo</span><span>🔬 30+ tecnologías</span>
       </div>
       <div class="start-actions">
         <button id="startCampaignBtn" class="primary-btn large">Iniciar campaña</button>
@@ -49,7 +49,7 @@
 
   <div class="game-shell">
     <header class="topbar">
-      <div class="brand-block"><div class="brand-mark">N</div><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.2</small></div></div>
+      <div class="brand-block"><div class="brand-mark">N</div><div><strong>NEXUS GLOBAL</strong><small>ALPHA v1.3</small></div></div>
       <div class="top-kpis">
         <div><i>🪙</i><span>Tesorería</span><b id="topTreasury">—</b></div>
         <div><i>💶</i><span>PIB</span><b id="topGDP">—</b></div>
@@ -62,9 +62,10 @@
         <div><i>🏛️</i><span>Gobierno</span><b id="topGovernment">—</b></div>
       </div>
       <div class="clock-block">
-        <strong id="currentDate">—</strong><span id="selectedCountryLabel">—</span>
+        <div class="date-time-line"><strong id="currentDate">—</strong><strong id="currentTime" class="current-time">00:00:00</strong></div><span id="selectedCountryLabel">—</span>
         <div class="sim-controls"><button id="playPauseBtn" class="primary-btn">▶</button><button data-speed="1" class="active">x1</button><button data-speed="2">x2</button><button data-speed="4">x4</button><button id="stepBtn">+1 día</button></div>
       </div>
+      <div id="topResourceStrip" class="top-resource-strip" aria-label="Producción y consumo de recursos"></div>
     </header>
 
     <nav class="main-nav">
@@ -72,6 +73,7 @@
       <button data-panel="economy">🏛 Economía</button>
       <button data-panel="regions">🗺️ Territorios</button>
       <button data-panel="industry">🏭 Industria</button>
+      <button data-panel="stock">📈 Bolsa</button>
       <button data-panel="politics">🗳️ Política</button>
       <button data-panel="technology">🔬 Tecnología</button>
       <button data-panel="military">🛡️ Militar</button>
@@ -102,6 +104,7 @@
             <canvas id="strategicMap" role="img" aria-label="Mapa mundial interactivo"></canvas>
             <div class="map-controls"><button id="mapZoomIn" title="Acercar">＋</button><button id="mapZoomOut" title="Alejar">−</button><button id="mapReset" title="Vista mundial">◎</button><button id="mapBaseToggle" title="Activar o desactivar cartografía OSM">▦</button></div>
             <div id="mapTooltip" class="map-tooltip" hidden></div>
+            <aside id="mapRegionList" class="map-region-list" hidden></aside>
             <div class="map-attribution">© OpenStreetMap contributors · Límites Natural Earth (dominio público)</div>
           </div>
         </article>
@@ -117,7 +120,7 @@
     </main>
 
     <footer class="bottom-dock">
-      <div class="dock-nav"><button data-panel="overview" class="active">🌐 Mundo</button><button data-panel="regions">🗺️ Territorios</button><button data-panel="politics">🏛️ Política</button><button data-panel="military">⚔️ Guerra</button><button data-panel="technology">🔬 Tecnología</button></div>
+      <div class="dock-nav"><button data-panel="overview" class="active">🌐 Mundo</button><button data-panel="regions">🗺️ Territorios</button><button data-panel="stock">📈 Bolsa</button><button data-panel="politics">🏛️ Política</button><button data-panel="military">⚔️ Guerra</button><button data-panel="technology">🔬 Tecnología</button></div>
       <div class="status-line"><span id="gameStatus">Simulación pausada</span><span id="scoreStatus">Puntuación 0</span></div>
       <div class="dock-actions"><button id="saveBtn">💾 Guardar</button><button id="loadBtn">📂 Cargar</button><button id="exportBtn">📤 Exportar</button><button id="menuSettingsBtn">⚙️ Opciones</button></div>
     </footer>
@@ -134,6 +137,7 @@
   <script src="js/economy.js"></script>
   <script src="js/simulation-plus.js"></script>
   <script src="js/deep-systems.js"></script>
+  <script src="js/alpha-v13.js"></script>
   <script src="js/map.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>

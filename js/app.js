@@ -1,8 +1,8 @@
 "use strict";
 
 (() => {
-  const SAVE_KEY="nexus_alpha_v1_2_save";
-  const LEGACY_KEYS=["nexus_alpha_v1_1_save","nexus_alpha_v1_0_save"];
+  const SAVE_KEY="nexus_alpha_v1_3_save";
+  const LEGACY_KEYS=["nexus_alpha_v1_2_save","nexus_alpha_v1_1_save","nexus_alpha_v1_0_save"];
   const DAY_MS=10000;
   let state,timer=null;
 
@@ -47,16 +47,25 @@
   function updateStartCard(id){const c=state.countries.find(x=>x.id===id)||state.countries.find(x=>x.id==="ESP");setText("startFlag",c.flag);setText("startCountryName",c.id==="ESP"?"España reforzada":c.name);setText("startCountrySummary",`PIB ${fmt(c.economy.gdp)} mil M€ · ${fmt(c.economy.population)} M habitantes · Industria ${c.systems.industry.toFixed(0)} · Tecnología ${c.systems.technology.toFixed(0)} · Militar ${c.systems.military.toFixed(0)}.`)}
   function rebind(){bindState()}
 
-  function setPanel(panel){const allowed=["overview","economy","regions","industry","politics","technology","military","diplomacy","intelligence","objectives","events","settings"];state.activePanel=allowed.includes(panel)?panel:"overview";if(panel==="regions"&&state.controlledCountryId==="ESP"){state.mapMode="regions";NEXUS_MAP_ENGINE.focusCountry("ESP")}else state.mapMode="world";NEXUS_UI.renderAll();NEXUS_MAP_ENGINE.render()}
+  function setPanel(panel){const allowed=["overview","economy","regions","industry","stock","politics","technology","military","diplomacy","intelligence","objectives","events","settings"];state.activePanel=allowed.includes(panel)?panel:"overview";if(panel==="regions"&&state.controlledCountryId==="ESP"){state.mapMode="regions";NEXUS_MAP_ENGINE.focusCountry("ESP")}else state.mapMode="world";NEXUS_UI.renderAll();NEXUS_MAP_ENGINE.render()}
   function setMapLayer(layer){if(!["political","economy","military","technology","stability"].includes(layer))return;state.mapLayer=layer;NEXUS_MAP_ENGINE.render();NEXUS_UI.renderAll()}
   function selectCountry(countryId){if(!state.countries.some(c=>c.id===countryId))return;state.selectedCountryId=countryId;state.mapMode="world";NEXUS_MAP_ENGINE.render();NEXUS_UI.renderAll()}
   function selectRegion(regionId){if(!state.regions.some(r=>r.id===regionId))return;state.selectedRegionId=regionId;state.selectedCountryId="ESP";state.mapMode="regions";NEXUS_MAP_ENGINE.focusRegion(regionId);NEXUS_UI.renderAll()}
 
-  function toggleRun(){state.running=!state.running;syncLoop();NEXUS_UI.renderAll()}
-  function setSpeed(speed){state.speed=[1,2,4].includes(Number(speed))?Number(speed):1;syncLoop();NEXUS_UI.renderAll()}
-  function syncLoop(){stopLoop();if(!state.running)return;timer=setInterval(stepDay,DAY_MS/state.speed)}
+  function currentClockFraction(){
+    state.simulation ||= {clockFraction:0,clockAnchor:null};
+    let fraction=Number(state.simulation.clockFraction)||0;
+    if(state.running&&state.simulation.clockAnchor){fraction+=(Date.now()-state.simulation.clockAnchor)/(DAY_MS/Math.max(1,state.speed||1));}
+    return Math.max(0,Math.min(.999999,fraction));
+  }
+  function freezeClock(){state.simulation ||= {};state.simulation.clockFraction=currentClockFraction();state.simulation.clockAnchor=null}
+  function resumeClock(){state.simulation ||= {};state.simulation.clockAnchor=Date.now()}
+  function resetClock(){state.simulation ||= {};state.simulation.clockFraction=0;state.simulation.clockAnchor=state.running?Date.now():null}
+  function toggleRun(){if(state.running){freezeClock();state.running=false}else{state.running=true;resumeClock()}syncLoop();NEXUS_UI.renderAll()}
+  function setSpeed(speed){const wasRunning=state.running;if(wasRunning)freezeClock();state.speed=[1,2,4].includes(Number(speed))?Number(speed):1;if(wasRunning)resumeClock();syncLoop();NEXUS_UI.renderAll()}
+  function syncLoop(){stopLoop();if(!state.running)return;if(!state.simulation?.clockAnchor)resumeClock();timer=setInterval(stepDay,DAY_MS/state.speed)}
   function stopLoop(){if(timer)clearInterval(timer);timer=null}
-  function stepDay(){const summary=NEXUS_ECONOMY.tickDay(state);if(state.settings.autosave&&state.dayIndex%7===0)saveState(false);NEXUS_MAP_ENGINE.render();NEXUS_UI.renderAll();if(summary?.budget?.monthlyBalance<-8)NEXUS_UI.toast("El déficit mensual está elevando la deuda.","warning")}
+  function stepDay(){const summary=NEXUS_ECONOMY.tickDay(state);resetClock();if(state.settings.autosave&&state.dayIndex%7===0)saveState(false);NEXUS_MAP_ENGINE.render();NEXUS_UI.renderAll();if(summary?.budget?.monthlyBalance<-8)NEXUS_UI.toast("El déficit mensual está elevando la deuda.","warning")}
 
   function updateBudget(key,value){NEXUS_ECONOMY.updateBudget(state,key,value);NEXUS_UI.renderAll()}
   function updateTaxRate(value){NEXUS_ECONOMY.updateTaxRate(state,value);NEXUS_UI.renderAll()}
@@ -88,7 +97,7 @@
   function loadState(){const raw=storageGet(SAVE_KEY)||LEGACY_KEYS.map(storageGet).find(Boolean);if(!raw)return null;try{return JSON.parse(raw)}catch(_){return null}}
   function manualLoad(){const loaded=normalizeLoadedState(loadState());if(!loaded){NEXUS_UI.toast("No hay guardado compatible.","warning");return}state=loaded;rebind();NEXUS_UI.toast("Partida cargada.","success")}
   function normalizeLoadedState(candidate){if(!candidate||typeof candidate!=="object"||!Array.isArray(candidate.countries))return null;try{return NEXUS_ECONOMY.hydrateState(candidate)}catch(error){console.warn("Guardado incompatible",error);return null}}
-  function exportSave(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`nexus-v1.2-${state.date}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);NEXUS_UI.toast("Guardado exportado.","success")}
+  function exportSave(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`nexus-v1.3-${state.date}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);NEXUS_UI.toast("Guardado exportado.","success")}
   function importSave(raw){try{const normalized=normalizeLoadedState(JSON.parse(raw));if(!normalized)throw new Error("Formato incompatible");state=normalized;rebind();NEXUS_UI.closeModal();NEXUS_UI.toast("Partida importada.","success")}catch(error){NEXUS_UI.toast(`Importación fallida: ${error.message}`,"error")}}
   function reset(){if(!confirm("¿Reiniciar la campaña?"))return;storageRemove(SAVE_KEY);for(const key of LEGACY_KEYS)storageRemove(key);state=NEXUS_ECONOMY.createInitialState();rebind();NEXUS_UI.toast("Campaña reiniciada.","success")}
   function updateSetting(key,value){state.settings[key]=value;document.body.classList.toggle("reduced-motion",state.settings.reducedMotion);document.body.classList.toggle("dense-ui",state.settings.denseUI);NEXUS_UI.renderAll();NEXUS_MAP_ENGINE.render()}
