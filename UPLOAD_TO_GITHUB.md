@@ -1,13 +1,24 @@
-# Subida a GitHub Pages
+# Subir NEXUS Global Alpha v1.4 a GitHub Pages
 
-1. Descomprime `NEXUS_Global_Alpha_v1.3_GitHub.zip`.
-2. Entra en la carpeta descomprimida.
-3. Selecciona todos los archivos y carpetas, incluido `.nojekyll`.
-4. Súbelos a la raíz del repositorio.
-5. Verifica que la ruta sea `tu-repositorio/index.html`, no `tu-repositorio/NEXUS_Global_Alpha_v1.3/index.html`.
-6. Abre `Settings → Pages → Deploy from a branch`.
-7. Selecciona `main` y `/ (root)`.
+1. Descarga y descomprime `NEXUS_Global_Alpha_v1.4_GitHub.zip`.
+2. Abre la carpeta descomprimida.
+3. Selecciona **todos los archivos y carpetas interiores**.
+4. Súbelos a la raíz de tu repositorio de GitHub.
+5. Confirma que se vea esta estructura:
 
-GitHub no descomprime automáticamente un ZIP subido como archivo.
+```text
+index.html
+404.html
+.nojekyll
+css/
+js/
+assets/
+tests/
+README.md
+```
 
-La base vectorial mundial y el respaldo regional funcionan desde el propio repositorio. Los mosaicos OpenStreetMap y la geometría administrativa detallada de `es-atlas` requieren conexión desde el navegador; si fallan, se utilizan los datos locales incluidos.
+6. En GitHub: `Settings → Pages → Deploy from a branch → main → / (root)`.
+7. Espera el despliegue y abre la URL indicada por GitHub.
+8. Haz una recarga forzada del navegador para evitar archivos de v1.3 en caché.
+
+No subas únicamente el ZIP: GitHub Pages no lo descomprime.

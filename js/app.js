@@ -1,8 +1,8 @@
 "use strict";
 
 (() => {
-  const SAVE_KEY="nexus_alpha_v1_3_save";
-  const LEGACY_KEYS=["nexus_alpha_v1_2_save","nexus_alpha_v1_1_save","nexus_alpha_v1_0_save"];
+  const SAVE_KEY="nexus_alpha_v1_4_save";
+  const LEGACY_KEYS=["nexus_alpha_v1_3_save","nexus_alpha_v1_2_save","nexus_alpha_v1_1_save","nexus_alpha_v1_0_save"];
   const DAY_MS=10000;
   let state,timer=null;
 
@@ -27,10 +27,10 @@
 
   function createActions(){return{
     setPanel,setMapLayer,selectCountry,selectRegion,toggleRun,setSpeed,stepDay,
-    updateBudget,updateTaxRate,investRegion,buildInRegion,upgradeBuilding,
-    queueUnit,setUnitBatch,deployUnit,startProject,buyShares,sellShares,takeover,
+    updateBudget,updateTaxRate,investRegion,buildInRegion,upgradeBuilding,expandRegionSlots,
+    queueUnit,setUnitBatch,deployUnit,moveUnit,attackRegion,startProject,buyShares,sellShares,takeover,
     diplomacy,operation,war,nuclearAlert,startResearch,enactPolicy,setDoctrine,
-    takeControl,changeRegime,appointParty,callElection,
+    takeControl,changeRegime,appointParty,callElection,negotiateCoalition,removeCoalitionParty,
     save:()=>saveState(true),load:manualLoad,exportSave,importSave,reset,updateSetting,repair
   }}
 
@@ -47,10 +47,10 @@
   function updateStartCard(id){const c=state.countries.find(x=>x.id===id)||state.countries.find(x=>x.id==="ESP");setText("startFlag",c.flag);setText("startCountryName",c.id==="ESP"?"España reforzada":c.name);setText("startCountrySummary",`PIB ${fmt(c.economy.gdp)} mil M€ · ${fmt(c.economy.population)} M habitantes · Industria ${c.systems.industry.toFixed(0)} · Tecnología ${c.systems.technology.toFixed(0)} · Militar ${c.systems.military.toFixed(0)}.`)}
   function rebind(){bindState()}
 
-  function setPanel(panel){const allowed=["overview","economy","regions","industry","stock","politics","technology","military","diplomacy","intelligence","objectives","events","settings"];state.activePanel=allowed.includes(panel)?panel:"overview";if(panel==="regions"&&state.controlledCountryId==="ESP"){state.mapMode="regions";NEXUS_MAP_ENGINE.focusCountry("ESP")}else state.mapMode="world";NEXUS_UI.renderAll();NEXUS_MAP_ENGINE.render()}
+  function setPanel(panel){const allowed=["overview","economy","regions","industry","stock","politics","technology","military","diplomacy","intelligence","objectives","events","settings"];state.activePanel=allowed.includes(panel)?panel:"overview";if(panel==="regions"){state.mapMode="regions";const countryId=state.selectedCountryId||state.controlledCountryId,regions=NEXUS_ECONOMY.getCountryRegions?.(state,countryId)||[];if(!regions.some(r=>r.id===state.selectedRegionId))state.selectedRegionId=regions[0]?.id||null;NEXUS_MAP_ENGINE.focusCountry(countryId)}else state.mapMode="world";NEXUS_UI.renderAll();NEXUS_MAP_ENGINE.render()}
   function setMapLayer(layer){if(!["political","economy","military","technology","stability"].includes(layer))return;state.mapLayer=layer;NEXUS_MAP_ENGINE.render();NEXUS_UI.renderAll()}
   function selectCountry(countryId){if(!state.countries.some(c=>c.id===countryId))return;state.selectedCountryId=countryId;state.mapMode="world";NEXUS_MAP_ENGINE.render();NEXUS_UI.renderAll()}
-  function selectRegion(regionId){if(!state.regions.some(r=>r.id===regionId))return;state.selectedRegionId=regionId;state.selectedCountryId="ESP";state.mapMode="regions";NEXUS_MAP_ENGINE.focusRegion(regionId);NEXUS_UI.renderAll()}
+  function selectRegion(countryId,regionId){if(regionId==null){regionId=countryId;countryId=state.selectedCountryId||state.controlledCountryId}const regions=NEXUS_ECONOMY.getCountryRegions?.(state,countryId)||[];if(!regions.some(r=>r.id===regionId))return;state.selectedRegionId=regionId;state.selectedCountryId=countryId;state.mapMode="regions";NEXUS_MAP_ENGINE.focusRegion(countryId,regionId);NEXUS_UI.renderAll()}
 
   function currentClockFraction(){
     state.simulation ||= {clockFraction:0,clockAnchor:null};
@@ -72,9 +72,12 @@
   function investRegion(type){result(NEXUS_ECONOMY.investRegion(state,state.selectedRegionId,type));refresh()}
   function buildInRegion(buildingId){result(NEXUS_ECONOMY.buildInRegion(state,state.selectedRegionId,buildingId));refresh()}
   function upgradeBuilding(id){result(NEXUS_ECONOMY.upgradeBuilding(state,state.selectedRegionId,id));refresh()}
+  function expandRegionSlots(){result(NEXUS_ECONOMY.expandRegionSlots(state,state.controlledCountryId,state.selectedRegionId));refresh()}
   function queueUnit(typeId,quantity){result(NEXUS_ECONOMY.queueUnitBatch(state,typeId,state.selectedRegionId,quantity||state.unitBatch||1));refresh()}
   function setUnitBatch(value){result(NEXUS_ECONOMY.changeUnitBatch(state,value));NEXUS_UI.renderAll()}
-  function deployUnit(unitId,regionId){result(NEXUS_ECONOMY.deployUnit(state,unitId,regionId));refresh()}
+  function deployUnit(unitId,regionId,countryId){result(NEXUS_ECONOMY.deployUnit(state,unitId,regionId,countryId||state.controlledCountryId));refresh()}
+  function moveUnit(unitId,regionId,countryId){result(NEXUS_ECONOMY.moveUnit(state,unitId,regionId,countryId||state.controlledCountryId));refresh()}
+  function attackRegion(unitId,targetCountryId,targetRegionId){result(NEXUS_ECONOMY.attackRegion(state,unitId,targetCountryId,targetRegionId));refresh()}
   function startProject(projectId){result(NEXUS_ECONOMY.startProject(state,projectId));refresh()}
   function buyShares(companyId,pct){result(NEXUS_ECONOMY.buyShares(state,companyId,pct));refresh()}
   function sellShares(companyId,pct){result(NEXUS_ECONOMY.sellShares(state,companyId,pct));refresh()}
@@ -90,6 +93,8 @@
   function changeRegime(regimeId){result(NEXUS_ECONOMY.changeRegime(state,regimeId));refresh()}
   function appointParty(partyId){result(NEXUS_ECONOMY.appointParty(state,partyId));refresh()}
   function callElection(){result(NEXUS_ECONOMY.callElection(state));refresh()}
+  function negotiateCoalition(partyId){result(NEXUS_ECONOMY.negotiateCoalition(state,partyId));refresh()}
+  function removeCoalitionParty(partyId){result(NEXUS_ECONOMY.removeCoalitionParty(state,partyId));refresh()}
   function result(r){if(r)NEXUS_UI.toast(r.message,r.ok?"success":"error")}
   function refresh(){NEXUS_MAP_ENGINE.render();NEXUS_UI.renderAll()}
 
@@ -97,7 +102,7 @@
   function loadState(){const raw=storageGet(SAVE_KEY)||LEGACY_KEYS.map(storageGet).find(Boolean);if(!raw)return null;try{return JSON.parse(raw)}catch(_){return null}}
   function manualLoad(){const loaded=normalizeLoadedState(loadState());if(!loaded){NEXUS_UI.toast("No hay guardado compatible.","warning");return}state=loaded;rebind();NEXUS_UI.toast("Partida cargada.","success")}
   function normalizeLoadedState(candidate){if(!candidate||typeof candidate!=="object"||!Array.isArray(candidate.countries))return null;try{return NEXUS_ECONOMY.hydrateState(candidate)}catch(error){console.warn("Guardado incompatible",error);return null}}
-  function exportSave(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`nexus-v1.3-${state.date}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);NEXUS_UI.toast("Guardado exportado.","success")}
+  function exportSave(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`nexus-v1.4-${state.date}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);NEXUS_UI.toast("Guardado exportado.","success")}
   function importSave(raw){try{const normalized=normalizeLoadedState(JSON.parse(raw));if(!normalized)throw new Error("Formato incompatible");state=normalized;rebind();NEXUS_UI.closeModal();NEXUS_UI.toast("Partida importada.","success")}catch(error){NEXUS_UI.toast(`Importación fallida: ${error.message}`,"error")}}
   function reset(){if(!confirm("¿Reiniciar la campaña?"))return;storageRemove(SAVE_KEY);for(const key of LEGACY_KEYS)storageRemove(key);state=NEXUS_ECONOMY.createInitialState();rebind();NEXUS_UI.toast("Campaña reiniciada.","success")}
   function updateSetting(key,value){state.settings[key]=value;document.body.classList.toggle("reduced-motion",state.settings.reducedMotion);document.body.classList.toggle("dense-ui",state.settings.denseUI);NEXUS_UI.renderAll();NEXUS_MAP_ENGINE.render()}
