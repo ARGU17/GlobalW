@@ -1,88 +1,55 @@
-# Validación técnica — Alpha v1.5
+# Validación técnica — Alpha v1.6
 
-## Comprobaciones automáticas
+## Validaciones ejecutadas
 
-- Sintaxis válida en todos los archivos JavaScript mediante `node --check`.
-- 197 países creados por el motor.
-- 176 empresas disponibles en Bolsa.
-- 42 instalaciones industriales, energéticas, sanitarias y logísticas.
+- Sintaxis de todos los archivos JavaScript mediante `node --check`.
+- Verificación de referencias CSS, JavaScript e imágenes locales desde `index.html`.
+- Validación JSON de los archivos cartográficos.
+- Integridad del ZIP mediante lectura completa de sus entradas.
+- Prueba del modelo y prueba DOM aislada de los paneles.
+
+## Resultado del modelo
+
+- Versión: `1.6-alpha`.
+- 197 países.
+- 176 empresas.
+- 42 instalaciones.
 - 62 tecnologías.
 - 17 comunidades autónomas españolas.
-- Los 13 paneles principales se renderizan mediante una prueba DOM aislada.
-- El panel político contiene el semicírculo, el marcador de mayoría y la Mesa de Coalición.
-- El panel militar contiene inventario, producción, despliegue, batallas y tratados.
+- Construcción industrial y producción militar conservadas al cruzar un cierre mensual.
+- Movimiento regional, conquista, ocupación y anexión verificados.
+- Cronología probada desde `2029-04-30` hasta `2029-05-03` sin límite final.
+- Incrementos presupuestarios de 0,5 puntos verificados.
+- Política de beneficios de empresa controlada verificada.
+- Decisión nacional verificada.
+- Declaración de guerra con identificador de Sala de Guerra verificada.
+- Ataque directo entre unidades y registro de operaciones verificados.
 
-## Prueba de construcción al cambiar de mes
+## Resultado de interfaz DOM
 
-1. Se inicia una instalación en una región española.
-2. Se fija el calendario en el último día del mes.
-3. Se avanza al mes siguiente.
-4. Se comprueba que la cola `facilityV3` sigue existiendo.
-5. Se avanza hasta completar el plazo.
-6. Se confirma que la instalación aparece en la región y la cola se retira únicamente después.
+Se renderizaron correctamente los 13 paneles:
 
-Resultado: **correcto**.
+- Resumen.
+- Economía.
+- Regiones.
+- Industria.
+- Bolsa.
+- Política.
+- Tecnología.
+- Militar.
+- Diplomacia.
+- Inteligencia.
+- Objetivos.
+- Eventos.
+- Configuración.
 
-## Prueba de producción militar al cambiar de mes
+También se verificó:
 
-1. Se registra el inventario inicial de submarinos.
-2. Se lanza una orden de 10 unidades.
-3. Se cruza el cierre mensual.
-4. Se comprueba que la orden `unitV2` no desaparece.
-5. Se completa la producción.
-6. Se comprueba que el inventario aumenta exactamente en 10.
+- Sala de Guerra con teatros y operaciones.
+- Parlamento semicircular y Mesa de Coalición.
+- Directorio diplomático con países desde Afganistán hasta Zimbabue.
+- Bolsa con 176 compañías.
 
-Resultado: **correcto**.
+## Prueba visual automatizada
 
-## Prueba de frentes y despliegue
-
-- División de un grupo de infantería en un nuevo destacamento.
-- Creación de un grupo independiente.
-- Asignación a una región diferente.
-- Movimiento y posición territorial conservados.
-
-Resultado: **correcto**.
-
-## Prueba de guerra y anexión
-
-- Declaración de guerra.
-- Ventaja militar suficiente.
-- Capitulación del defensor.
-- Anexión total.
-- Todas las regiones cambian a `ownerId` y `controllerId` del vencedor.
-- El país derrotado queda registrado como no soberano y anexionado.
-
-Resultado: **correcto**.
-
-## Prueba política
-
-- Los partidos reciben un reparto normalizado de 350 escaños.
-- Mayoría absoluta fijada en 176 escaños.
-- Partidos próximos tienen compatibilidad alta.
-- Extrema izquierda y extrema derecha tienen probabilidad de coalición cero.
-- Gráfico y controles se renderizan en el panel político.
-
-Resultado: **correcto**.
-
-## Ejecución reproducible
-
-```bash
-node tests/model-validation.js
-node tests/ui-render-validation.js
-```
-
-Salida principal esperada:
-
-```json
-{
-  "ok": true,
-  "version": "1.5-alpha",
-  "countries": 197,
-  "companies": 176,
-  "industries": 42,
-  "technologies": 62,
-  "regionsSpain": 17
-}
-```
-
-La captura automatizada con Chromium no fue fiable en el entorno de empaquetado por restricciones del proceso gráfico. Sí se completaron las pruebas sintácticas, de modelo, colas, producción, movimiento, anexión y renderizado DOM.
+El entorno de empaquetado bloqueó el acceso de Chromium automatizado al servidor local (`ERR_BLOCKED_BY_ADMINISTRATOR`). Por ello no se afirma una captura visual automatizada. La validación sí cubre sintaxis, datos, lógica de simulación, renderizado DOM, rutas e integridad del paquete.

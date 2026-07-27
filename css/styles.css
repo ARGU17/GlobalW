@@ -81,3 +81,42 @@
 .coalition-builder{border-color:#315e79}.coalition-seatbar{position:relative;height:30px;margin:8px 0 12px;border:1px solid #244d68;border-radius:999px;background:#05131f;overflow:hidden}.coalition-seatbar i{display:block;height:100%;background:linear-gradient(90deg,#1e91d6,#56dfb2)}.coalition-seatbar::after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px dashed #ffe16b}.coalition-seatbar b{position:absolute;left:12px;top:7px;font-size:10px}.coalition-seatbar em{position:absolute;right:12px;top:7px;color:#ffe16b;font-size:8px;font-style:normal}.coalition-members,.coalition-candidates{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:7px}.coalition-members article,.coalition-candidates article{display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px;border:1px solid #1f4863;border-radius:7px;background:#071a29}.coalition-members i,.coalition-candidates i{width:8px;height:34px;border-radius:4px}.coalition-members b,.coalition-candidates b{display:block;font-size:9px}.coalition-members small,.coalition-candidates small{display:block;color:#89aabd;font-size:7px;margin-top:2px}.coalition-members span{font-size:7px;color:#69d8ff}.coalition-builder h4{margin:12px 0 7px;font-size:9px;color:#7fd5f8;letter-spacing:.06em;text-transform:uppercase}
 @media(max-width:1100px){.unit-orders{grid-template-columns:1fr auto}.unit-orders input,.unit-orders select{min-width:0}.unit-orders button{grid-column:auto}}
 @media(max-width:650px){.military-inventory{grid-template-columns:1fr}.unit-orders{grid-template-columns:1fr}.war-actions{justify-content:stretch}.war-actions button{width:100%}.coalition-members,.coalition-candidates{grid-template-columns:1fr}}
+
+/* ==========================================================
+   ALPHA v1.6 · WAR ROOM, CORPORATE GOVERNANCE AND BUDGET UX
+========================================================== */
+.war-command.prominent{border-color:#a74755;box-shadow:0 0 0 1px rgba(255,89,105,.12),0 18px 46px rgba(0,0,0,.2)}
+.war-detail-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}
+.war-detail-strip span{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(6,20,31,.7);font-size:.72rem;color:var(--muted)}
+.war-operations-preview{display:grid;gap:6px;margin:10px 0}
+.war-operations-preview p{display:grid;grid-template-columns:86px 1fr;gap:8px;margin:0;padding:7px 9px;border-left:2px solid #ff6877;background:rgba(255,104,119,.055);font-size:.72rem}
+.war-operations-preview time{color:var(--muted)}
+.engagement-grid,.theater-grid,.decision-grid,.corporate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.engagement-card,.decision-card,.corporate-card,.theater-grid article{padding:12px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(180deg,rgba(13,35,51,.92),rgba(6,20,31,.92))}
+.engagement-card header,.decision-card header,.corporate-card header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.engagement-card p,.decision-card p,.corporate-card p{margin:6px 0;color:var(--muted);font-size:.76rem;line-height:1.45}
+.decision-card header span{font-size:1.55rem}
+.decision-card button,.corporate-card button{width:100%;margin-top:8px}
+.corporate-policy-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.corporate-policy-row button{width:auto;margin:0}
+.corporate-card>small{display:block;margin-top:8px;color:var(--muted);line-height:1.35}
+.budget-stepper{display:grid;grid-template-columns:auto minmax(120px,1fr) auto;gap:8px;align-items:center}
+.budget-stepper button{padding:7px 9px;white-space:nowrap}
+.budget-stepper input{width:100%}
+.all-countries{max-height:none}
+.diplomacy-directory-card{overflow:visible}
+.war-room-modal{display:grid;gap:12px}
+.war-room-modal .war-card{margin-top:0}
+.battle-log{display:grid;gap:7px;max-height:360px;overflow:auto}
+.battle-log article{display:grid;grid-template-columns:90px 1fr;gap:10px;padding:9px;border-bottom:1px solid var(--line)}
+.battle-log time{color:var(--muted);font-size:.7rem}
+.battle-log p{margin:3px 0;color:var(--muted)}
+.modal-card:has(.war-room-modal){width:min(1220px,96vw);max-height:94vh}
+.unit-orders select[id^="attackUnit-"],.unit-orders select[id^="attackCountry-"]{border-color:rgba(255,89,105,.45)}
+
+@media(max-width:900px){
+  .war-detail-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .budget-stepper{grid-template-columns:1fr 1fr}
+  .budget-stepper input{grid-column:1/-1;grid-row:1}
+  .corporate-policy-row{grid-template-columns:1fr}
+}

@@ -1,8 +1,8 @@
-# Subir NEXUS Global Alpha v1.5 a GitHub Pages
+# Subir NEXUS Global Alpha v1.6 a GitHub Pages
 
-1. Descarga y descomprime `NEXUS_Global_Alpha_v1.5_GitHub.zip`.
+1. Descarga y descomprime `NEXUS_Global_Alpha_v1.6_GitHub.zip`.
 2. Abre la carpeta descomprimida.
-3. Selecciona todos los archivos y carpetas interiores.
+3. Selecciona **todos los archivos y carpetas interiores**.
 4. Súbelos a la raíz del repositorio.
 5. Comprueba esta estructura:
 
@@ -17,10 +17,9 @@ tests/
 README.md
 ```
 
-6. En GitHub: `Settings → Pages → Deploy from a branch → main → / (root)`.
-7. Espera a que finalice el despliegue.
-8. Haz una recarga forzada del navegador.
+6. En GitHub abre `Settings → Pages`.
+7. Selecciona `Deploy from a branch → main → / (root)`.
+8. Espera a que termine el despliegue.
+9. Realiza una recarga forzada para descartar la caché anterior.
 
-Los archivos se solicitan con `?v=1.5`, por lo que el navegador no debería reutilizar JavaScript o CSS de v1.4.
-
-No subas únicamente el ZIP: GitHub Pages no lo descomprime.
+Los recursos se solicitan con `?v=1.6`. No subas únicamente el ZIP: GitHub Pages no lo descomprime.

@@ -11,7 +11,7 @@ if (!global.performance) global.performance = { now: () => Date.now() };
 
 for (const file of [
   "world-data.js","data.js","catalog.js","politics.js","economy.js",
-  "simulation-plus.js","deep-systems.js","alpha-v13.js","alpha-v14.js","alpha-v15.js"
+  "simulation-plus.js","deep-systems.js","alpha-v13.js","alpha-v14.js","alpha-v15.js","alpha-v16.js"
 ]) {
   vm.runInThisContext(fs.readFileSync(path.join(root,"js",file),"utf8"), { filename:file });
 }
@@ -21,7 +21,7 @@ const C = global.NEXUS_CATALOG;
 const assert = (condition,message) => { if (!condition) throw new Error(message); };
 
 const state = E.createInitialState();
-assert(state.version === "1.5-alpha", "Versión incorrecta");
+assert(state.version === "1.6-alpha", "Versión incorrecta");
 assert(state.countries.length === 197, "Deben existir 197 países");
 assert(state.companies.length >= 170, "Bolsa insuficientemente ampliada");
 assert(C.buildings.length >= 40, "Catálogo industrial insuficiente");
@@ -110,6 +110,32 @@ for (const def of C.buildings) {
 {
   const s=E.createInitialState(),c=E.getCountry(s,"ESP"),u=c.units.find(x=>x.typeId==="infantry"&&x.quantity>100),targets=E.getCountryRegions(s,"ESP").filter(r=>r.id!==u.regionId);
   const before=c.units.length;assert(E.splitUnit(s,u.id,100,targets[0].id).ok,"No se pudo dividir la unidad");assert(c.units.length===before+1,"No se creó el destacamento");
+}
+
+
+// Alpha v1.6: cronología indefinida, presupuestos, empresas, decisiones y combate directo.
+{
+  const s=E.createInitialState(),c=E.getCountry(s,"ESP");
+  assert(s.timeline?.indefinite===true&&s.timeline?.mode==="indefinite","La cronología no está marcada como indefinida");
+  s.date="2029-04-30";for(let i=0;i<3;i++)E.tickDay(s);assert(s.date==="2029-05-03","La simulación no superó el 30 de abril de 2029");
+  const healthBefore=c.budgets.health;assert(E.adjustBudget(s,"health",.5).ok&&c.budgets.health===Math.round((healthBefore+.5)*10)/10,"El botón presupuestario no incrementa el porcentaje");
+
+  const controlled=s.companies.find(x=>x.countryId==="ESP")||s.companies[0];
+  controlled.ownershipByCountry ||= {};controlled.ownershipByCountry.ESP=60;
+  assert(controlled,"No hay empresa para probar gobierno corporativo");
+  controlled.financials.profit=Math.max(120,Number(controlled.financials.profit)||0);
+  assert(E.setCompanyPolicy(s,controlled.id,"dividend").ok,"No se pudo fijar política de dividendos");
+  const treasuryBefore=c.economy.treasury;E.processControlledCompanyProfits(s);assert(c.economy.treasury>treasuryBefore,"Los beneficios controlados no llegaron al Tesoro");
+  c.economy.treasury=1000;c.politics.politicalCapital=100;assert(E.enactNationalDecision(s,"housingPlan").ok,"No se pudo adoptar una decisión nacional");
+
+  const d=E.getCountry(s,"AND");c.relations.AND=0;d.relations.ESP=0;c.militaryReadiness=99;
+  const declaration=E.warAction(s,"AND","declare");assert(declaration.ok&&declaration.warId,"La declaración de guerra no devuelve identificador para la sala de guerra");
+  const attacker=c.units.find(u=>u.quantity>0&&!['frigate','destroyer','submarine','carrier','satellite','missile','cyber'].includes(u.typeId));
+  const defender=d.units.find(u=>u.quantity>0)||d.units[0];
+  assert(attacker&&defender,"Faltan fuerzas para validar el combate directo");
+  const direct=E.attackUnit(s,attacker.id,"AND",defender.id);assert(direct.ok&&direct.warId===declaration.warId,"No se pudo ordenar un ataque directo entre unidades");
+  for(let i=0;i<20;i++)E.tickDay(s);
+  const war=s.wars.find(w=>w.id===declaration.warId);assert(war&&Array.isArray(war.operations)&&war.operations.length>0,"La guerra no registra operaciones");
 }
 
 // Compatibilidad política: extremos incompatibles, espacios próximos negociables.

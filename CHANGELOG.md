@@ -1,5 +1,23 @@
 # Changelog
 
+## Alpha v1.6
+
+- Eliminado cualquier límite temporal de campaña.
+- Añadida recuperación automática de fechas inválidas o ticks bloqueados.
+- Sustituido el intervalo fijo por temporizadores encadenados para evitar solapamientos.
+- Añadida Sala de Guerra automática al declarar una guerra o iniciar una ofensiva.
+- Añadidos teatros, fase, intensidad, logística, superioridad aérea, control naval y operaciones.
+- Añadidos ataques directos entre unidades desplegadas.
+- Añadidas ofensivas generales contra países desde unidades seleccionadas.
+- Añadido gobierno corporativo para empresas controladas al 51% o más.
+- Añadidas cinco políticas de reparto de beneficios empresariales.
+- Añadidas doce decisiones nacionales en el panel político.
+- Eliminado el límite de 36 países en el directorio diplomático.
+- Añadidos controles −0,5/+0,5 a las partidas del presupuesto nacional.
+- Elevado el rango presupuestario operativo hasta el 20% del PIB.
+- Guardado actualizado a v1.6 con migración desde versiones anteriores.
+- Recursos versionados con `?v=1.6` para evitar caché obsoleta en GitHub Pages.
+
 ## Alpha v1.5
 
 - Corregida la eliminación de colas `facilityV3` y `unitV2` durante el cierre económico mensual.
