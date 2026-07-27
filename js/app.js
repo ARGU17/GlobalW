@@ -1,8 +1,8 @@
 "use strict";
 
 (() => {
-  const SAVE_KEY="nexus_alpha_v1_4_save";
-  const LEGACY_KEYS=["nexus_alpha_v1_3_save","nexus_alpha_v1_2_save","nexus_alpha_v1_1_save","nexus_alpha_v1_0_save"];
+  const SAVE_KEY="nexus_alpha_v1_5_save";
+  const LEGACY_KEYS=["nexus_alpha_v1_4_save","nexus_alpha_v1_3_save","nexus_alpha_v1_2_save","nexus_alpha_v1_1_save","nexus_alpha_v1_0_save"];
   const DAY_MS=10000;
   let state,timer=null;
 
@@ -28,9 +28,9 @@
   function createActions(){return{
     setPanel,setMapLayer,selectCountry,selectRegion,toggleRun,setSpeed,stepDay,
     updateBudget,updateTaxRate,investRegion,buildInRegion,upgradeBuilding,expandRegionSlots,
-    queueUnit,setUnitBatch,deployUnit,moveUnit,attackRegion,startProject,buyShares,sellShares,takeover,
+    queueUnit,setUnitBatch,deployUnit,moveUnit,attackRegion,splitUnit,startProject,buyShares,sellShares,takeover,
     diplomacy,operation,war,nuclearAlert,startResearch,enactPolicy,setDoctrine,
-    takeControl,changeRegime,appointParty,callElection,negotiateCoalition,removeCoalitionParty,
+    takeControl,changeRegime,appointParty,callElection,negotiateCoalition,removeCoalitionParty,demandSurrender,annexOccupiedRegions,annexCountry,signPeace,
     save:()=>saveState(true),load:manualLoad,exportSave,importSave,reset,updateSetting,repair
   }}
 
@@ -78,6 +78,7 @@
   function deployUnit(unitId,regionId,countryId){result(NEXUS_ECONOMY.deployUnit(state,unitId,regionId,countryId||state.controlledCountryId));refresh()}
   function moveUnit(unitId,regionId,countryId){result(NEXUS_ECONOMY.moveUnit(state,unitId,regionId,countryId||state.controlledCountryId));refresh()}
   function attackRegion(unitId,targetCountryId,targetRegionId){result(NEXUS_ECONOMY.attackRegion(state,unitId,targetCountryId,targetRegionId));refresh()}
+  function splitUnit(unitId,quantity,targetRegionId){result(NEXUS_ECONOMY.splitUnit(state,unitId,quantity,targetRegionId));refresh()}
   function startProject(projectId){result(NEXUS_ECONOMY.startProject(state,projectId));refresh()}
   function buyShares(companyId,pct){result(NEXUS_ECONOMY.buyShares(state,companyId,pct));refresh()}
   function sellShares(companyId,pct){result(NEXUS_ECONOMY.sellShares(state,companyId,pct));refresh()}
@@ -95,6 +96,10 @@
   function callElection(){result(NEXUS_ECONOMY.callElection(state));refresh()}
   function negotiateCoalition(partyId){result(NEXUS_ECONOMY.negotiateCoalition(state,partyId));refresh()}
   function removeCoalitionParty(partyId){result(NEXUS_ECONOMY.removeCoalitionParty(state,partyId));refresh()}
+  function demandSurrender(warId){result(NEXUS_ECONOMY.demandSurrender(state,warId));refresh()}
+  function annexOccupiedRegions(warId){result(NEXUS_ECONOMY.annexOccupiedRegions(state,warId));refresh()}
+  function annexCountry(warId){result(NEXUS_ECONOMY.annexCountry(state,warId));refresh()}
+  function signPeace(warId){result(NEXUS_ECONOMY.signPeace(state,warId));refresh()}
   function result(r){if(r)NEXUS_UI.toast(r.message,r.ok?"success":"error")}
   function refresh(){NEXUS_MAP_ENGINE.render();NEXUS_UI.renderAll()}
 
@@ -102,7 +107,7 @@
   function loadState(){const raw=storageGet(SAVE_KEY)||LEGACY_KEYS.map(storageGet).find(Boolean);if(!raw)return null;try{return JSON.parse(raw)}catch(_){return null}}
   function manualLoad(){const loaded=normalizeLoadedState(loadState());if(!loaded){NEXUS_UI.toast("No hay guardado compatible.","warning");return}state=loaded;rebind();NEXUS_UI.toast("Partida cargada.","success")}
   function normalizeLoadedState(candidate){if(!candidate||typeof candidate!=="object"||!Array.isArray(candidate.countries))return null;try{return NEXUS_ECONOMY.hydrateState(candidate)}catch(error){console.warn("Guardado incompatible",error);return null}}
-  function exportSave(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`nexus-v1.4-${state.date}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);NEXUS_UI.toast("Guardado exportado.","success")}
+  function exportSave(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`nexus-v1.5-${state.date}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);NEXUS_UI.toast("Guardado exportado.","success")}
   function importSave(raw){try{const normalized=normalizeLoadedState(JSON.parse(raw));if(!normalized)throw new Error("Formato incompatible");state=normalized;rebind();NEXUS_UI.closeModal();NEXUS_UI.toast("Partida importada.","success")}catch(error){NEXUS_UI.toast(`Importación fallida: ${error.message}`,"error")}}
   function reset(){if(!confirm("¿Reiniciar la campaña?"))return;storageRemove(SAVE_KEY);for(const key of LEGACY_KEYS)storageRemove(key);state=NEXUS_ECONOMY.createInitialState();rebind();NEXUS_UI.toast("Campaña reiniciada.","success")}
   function updateSetting(key,value){state.settings[key]=value;document.body.classList.toggle("reduced-motion",state.settings.reducedMotion);document.body.classList.toggle("dense-ui",state.settings.denseUI);NEXUS_UI.renderAll();NEXUS_MAP_ENGINE.render()}

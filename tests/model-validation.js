@@ -11,7 +11,7 @@ if (!global.performance) global.performance = { now: () => Date.now() };
 
 for (const file of [
   "world-data.js","data.js","catalog.js","politics.js","economy.js",
-  "simulation-plus.js","deep-systems.js","alpha-v13.js","alpha-v14.js"
+  "simulation-plus.js","deep-systems.js","alpha-v13.js","alpha-v14.js","alpha-v15.js"
 ]) {
   vm.runInThisContext(fs.readFileSync(path.join(root,"js",file),"utf8"), { filename:file });
 }
@@ -21,7 +21,7 @@ const C = global.NEXUS_CATALOG;
 const assert = (condition,message) => { if (!condition) throw new Error(message); };
 
 const state = E.createInitialState();
-assert(state.version === "1.4-alpha", "Versión incorrecta");
+assert(state.version === "1.5-alpha", "Versión incorrecta");
 assert(state.countries.length === 197, "Deben existir 197 países");
 assert(state.companies.length >= 170, "Bolsa insuficientemente ampliada");
 assert(C.buildings.length >= 40, "Catálogo industrial insuficiente");
@@ -79,6 +79,37 @@ for (const def of C.buildings) {
   assert(E.getControlledRegions(s,"ESP").some(r=>r.id===region.id),"La región conquistada no aparece entre los territorios controlados");
   const occupiedProduction=Object.values(E.getCountry(s,"ESP").resourceBalance||{}).reduce((sum,row)=>sum+(row.occupationProduction||0),0);
   assert(occupiedProduction>0,"La ocupación no transfirió producción regional");
+}
+
+
+// Cruce de mes: las colas diarias no pueden desaparecer por el procesador mensual.
+{
+  const s=E.createInitialState(),c=E.getCountry(s,"ESP"),r=E.getCountryRegions(s,"ESP")[0];
+  c.economy.treasury=100000;c.systems.technology=100;c.systems.energy=100;c.systems.industry=100;r.infra=100;r.energy=100;r.stability=100;r.capacitySlots=999;
+  const def=C.buildings.find(x=>!E.facilitiesInRegion(s,c,r.id).some(f=>f.typeId===x.id));
+  assert(E.buildInRegion(s,r.id,def.id).ok,"No se pudo iniciar industria para prueba mensual");
+  const fq=c.productionQueue.find(q=>q.kind==="facilityV3"&&q.buildingId===def.id);fq.daysRemaining=2;s.date="2028-01-31";E.tickDay(s);
+  assert(c.productionQueue.some(q=>q.id===fq.id),"La industria desapareció al cerrar el mes");
+  E.tickDay(s);assert(E.facilitiesInRegion(s,c,r.id).some(f=>f.typeId===def.id),"La industria no se creó tras cruzar el mes");
+
+  const before=(c.units.find(u=>u.typeId==="submarine")?.quantity||0);assert(E.queueUnitBatch(s,"submarine",r.id,10).ok,"No se pudo pedir submarinos");
+  const uq=c.productionQueue.find(q=>q.kind==="unitV2"&&q.typeId==="submarine");uq.daysRemaining=2;s.date="2028-02-29";E.tickDay(s);
+  assert(c.productionQueue.some(q=>q.id===uq.id),"La orden militar desapareció al cerrar el mes");
+  E.tickDay(s);const after=c.units.filter(u=>u.typeId==="submarine").reduce((sum,u)=>sum+u.quantity,0);assert(after===before+10,"El recuento de submarinos no creció correctamente");
+}
+
+// Tratado y anexión total.
+{
+  const s=E.createInitialState(),a=E.getCountry(s,"ESP"),d=E.getCountry(s,"AND");s.controlledCountryId="ESP";a.relations.AND=0;d.relations.ESP=0;a.militaryReadiness=99;
+  assert(E.warAction(s,"AND","declare").ok,"No se declaró la guerra de tratado");const w=s.wars.find(x=>!x.ended&&x.defender==="AND");w.warScore=90;w.territoryControl=90;
+  assert(E.demandSurrender(s,w.id).ok,"No se pudo exigir capitulación");assert(E.annexCountry(s,w.id).ok,"No se pudo anexar el país derrotado");
+  assert(d.annexedBy==="ESP"&&!d.sovereign,"La anexión total no quedó registrada");assert(E.getCountryRegions(s,"AND").every(r=>r.ownerId==="ESP"&&r.controllerId==="ESP"),"Las regiones anexionadas no cambiaron de propietario");
+}
+
+// División de fuerzas para operar desde varios flancos.
+{
+  const s=E.createInitialState(),c=E.getCountry(s,"ESP"),u=c.units.find(x=>x.typeId==="infantry"&&x.quantity>100),targets=E.getCountryRegions(s,"ESP").filter(r=>r.id!==u.regionId);
+  const before=c.units.length;assert(E.splitUnit(s,u.id,100,targets[0].id).ok,"No se pudo dividir la unidad");assert(c.units.length===before+1,"No se creó el destacamento");
 }
 
 // Compatibilidad política: extremos incompatibles, espacios próximos negociables.

@@ -210,9 +210,9 @@ window.NEXUS_MAP_ENGINE = (() => {
   function drawWars(){
     const now=Date.now();
     for(const battle of state.regionBattles||[]){
-      if(battle.resolved)continue;const target=window.NEXUS_ECONOMY?.getRegion?.(state,battle.targetCountryId,battle.targetRegionId);if(!target)continue;const bp=toScreen(target.lat,target.lng),pulse=12+Math.sin(now/190)*4;
+      if(battle.resolved||battle.ended)continue;const target=window.NEXUS_ECONOMY?.getRegion?.(state,battle.targetCountryId,battle.regionId||battle.targetRegionId);if(!target)continue;const bp=toScreen(target.lat,target.lng),pulse=12+Math.sin(now/190)*4;
       ctx.save();ctx.beginPath();ctx.arc(bp.x,bp.y,pulse,0,Math.PI*2);ctx.fillStyle="rgba(255,70,80,.16)";ctx.fill();ctx.strokeStyle="#ff5868";ctx.lineWidth=2.2;ctx.stroke();ctx.font="17px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";ctx.fillText("⚔",bp.x,bp.y);ctx.restore();
-      hitMarkers.push({x:bp.x,y:bp.y,r:23,html:`<strong>⚔ Batalla por ${target.name}</strong><span>Día ${battle.days||1} · Progreso ${(battle.progress||0).toFixed(0)}%</span><span>Atacante ${Math.round(battle.attackerPower||0).toLocaleString("es-ES")} · Defensor ${Math.round(battle.defenderPower||0).toLocaleString("es-ES")}</span>`});
+      hitMarkers.push({x:bp.x,y:bp.y,r:23,html:`<strong>⚔ Batalla por ${target.name}</strong><span>Día ${battle.days||1} · Control ${(battle.controlProgress||battle.progress||0).toFixed(0)}%</span><span>Bajas atacante ${Math.round(battle.attackerLosses||0).toLocaleString("es-ES")} · defensor ${Math.round(battle.defenderLosses||0).toLocaleString("es-ES")}</span>`});
     }
     for(const war of state.wars.filter(w=>!w.ended)){
       const a=state.countries.find(c=>c.id===war.attacker),d=state.countries.find(c=>c.id===war.defender);if(!a||!d)continue;const p1=toScreen(a.map.lat,a.map.lng),p2=toScreen(d.map.lat,d.map.lng),mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2-30;

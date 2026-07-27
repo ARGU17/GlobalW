@@ -1,26 +1,32 @@
 # Changelog
 
+## Alpha v1.5
+
+- Corregida la eliminación de colas `facilityV3` y `unitV2` durante el cierre económico mensual.
+- El procesador mensual solo actúa sobre proyectos heredados basados en meses.
+- Añadido libro de integridad de construcción para detectar y recuperar proyectos huérfanos.
+- Añadidas pruebas específicas de construcción y producción militar cruzando el cambio de mes.
+- Corregido el incremento de cantidades militares al completar una orden.
+- Añadido inventario militar agregado por sistema, grupos, regiones y movimiento.
+- Añadida división de unidades en destacamentos para operar desde varios flancos.
+- Mejorada la selección de la región de destino de la producción militar.
+- Corregidos los marcadores de batallas regionales del mapa.
+- Añadido centro de tratados, capitulación, anexión parcial y anexión total.
+- Añadidos balances de guerra, historial de conflictos y decisiones de posguerra.
+- Las regiones anexionadas cambian de propietario y controlador.
+- Añadida Mesa de Coalición con 350 escaños, socios potenciales y mayoría de 176.
+- Reforzado el gráfico semicircular de poder político y sus controles de negociación.
+- Guardado actualizado a v1.5 con migración desde v1.4 y anteriores.
+- Añadido versionado de caché `?v=1.5` en CSS y JavaScript.
+
 ## Alpha v1.4
 
-- Corregido el fallo por el que una construcción terminaba, desaparecía de la cola y no generaba la instalación.
-- Añadida cola transaccional `facilityV3` con región protegida, reubicación segura y reembolso ante errores irrecuperables.
-- Validación automática de finalización para los 42 tipos de instalaciones.
-- Corregido el renderizado de Rusia y otras geometrías que cruzan el antimeridiano.
-- Nuevo cálculo de encuadre y zoom para países grandes o fragmentados.
-- Zoom máximo ampliado y selección de países por geometría real.
-- Catálogo ampliado a 42 instalaciones, incluyendo farmacia, biotecnología, alimentación, petróleo, gas, GNL, petroquímica, fertilizantes, minería, baterías, electrónica, hidrógeno y agua.
-- Capacidad regional ampliable en bloques de 2 slots a bajo coste.
-- Árbol tecnológico ampliado a 62 investigaciones.
-- Bolsa ampliada a 176 empresas con filtros por sector y búsqueda.
-- Regiones estratégicas añadidas a los 197 países.
-- Recursos regionales visibles en mapa y panel territorial.
-- Unidades militares asignadas a regiones, con movimiento animado y tiempo de tránsito.
-- Ataques regionales, batallas diarias, bajas, progreso de control y conquista de territorio.
-- Coaliciones multipartidistas con eje ideológico, coste, compatibilidad y probabilidad de acuerdo.
-- Gráfico político semicircular dinámico, con 180° = 100% y marcador de mayoría en 90° = 50%.
-- Panel de territorios habilitado para inspeccionar regiones extranjeras y evaluar objetivos.
-- `404.html` sustituido por una redirección segura para GitHub Pages.
-- Guardado actualizado a v1.4 con migración desde versiones anteriores.
+- Catálogo ampliado a 42 instalaciones y 62 tecnologías.
+- Bolsa ampliada a 176 empresas.
+- Regiones estratégicas para 197 países.
+- Movimiento, combate y conquista regional.
+- Coaliciones multipartidistas y gráfico parlamentario.
+- Corrección del antimeridiano para Rusia y otros países extensos.
 
 ## Alpha v1.3
 

@@ -178,23 +178,44 @@ window.NEXUS_ECONOMY = (() => {
   }
 
   function processCountryQueues(country, state) {
-    for (const item of country.productionQueue) item.monthsRemaining -= 1;
-    const completed = country.productionQueue.filter(item => item.monthsRemaining <= 0);
-    country.productionQueue = country.productionQueue.filter(item => item.monthsRemaining > 0);
+    /*
+      Solo los proyectos heredados basados en meses deben procesarse aquí.
+      Las colas unitV2/facilityV2/facilityV3 usan días y son procesadas por
+      deep-systems/alpha-v14. El código anterior restaba 1 a `undefined`,
+      generaba NaN y eliminaba esas órdenes al cerrar cada mes.
+    */
+    const monthlyKinds = new Set(["unit", "project", "building"]);
+    for (const item of country.productionQueue) {
+      if (!monthlyKinds.has(item.kind)) continue;
+      item.monthsRemaining = Math.max(0, Number(item.monthsRemaining ?? item.totalMonths ?? 1) - 1);
+    }
+    const completed = country.productionQueue.filter(item => monthlyKinds.has(item.kind) && item.monthsRemaining <= 0);
+    country.productionQueue = country.productionQueue.filter(item => !monthlyKinds.has(item.kind) || item.monthsRemaining > 0);
 
     for (const item of completed) {
       if (item.kind === "unit") {
         const def = state.unitCatalog.find(unit => unit.id === item.typeId);
-        country.units.push({
-          id: crypto.randomUUID(),
-          typeId: item.typeId,
-          regionId: item.regionId,
-          name: item.name,
-          readiness: 72,
-          experience: 25,
-          strength: 100
-        });
-        pushEvent(state, "military", `${def.name} completada`, `${item.name} ha sido desplegada en ${getRegion(state, item.regionId).name}.`);
+        const quantity = Math.max(1, Number(item.quantity) || 1);
+        const existing = country.units.find(unit => unit.typeId === item.typeId && unit.regionId === item.regionId && !unit.movement);
+        if (existing) {
+          existing.quantity = (Number(existing.quantity) || 0) + quantity;
+          existing.readiness = Math.max(existing.readiness || 0, 72);
+          existing.strength = Math.max(existing.strength || 0, 100);
+        } else {
+          country.units.push({
+            id: crypto.randomUUID(),
+            typeId: item.typeId,
+            regionId: item.regionId,
+            name: item.name,
+            quantity,
+            readiness: 72,
+            experience: 25,
+            strength: 100,
+            status: "desplegada"
+          });
+        }
+        const region = state.regions.find(r => r.id === item.regionId);
+        pushEvent(state, "military", `${def?.name || item.name} completada`, `${quantity.toLocaleString("es-ES")} ${def?.unitName || "unidades"} desplegadas en ${region?.name || "el territorio asignado"}.`);
       }
       if (item.kind === "project") completeNationalProject(country, item, state);
       if (item.kind === "building") {
@@ -202,7 +223,7 @@ window.NEXUS_ECONOMY = (() => {
         const def = window.NEXUS_CATALOG?.buildings?.find(b => b.id === item.buildingId);
         if (region && def) {
           region.buildings ||= [];
-          region.buildings.push({ id: crypto.randomUUID(), typeId: def.id, level: 1, condition: 100 });
+          region.buildings.push({ id: crypto.randomUUID(), typeId: def.id, level: 1, condition: 100, regionId: region.id, countryId: country.id });
           pushEvent(state, "region", `${def.name} completada`, `${region.name} incorpora una nueva instalación.`);
         }
       }
